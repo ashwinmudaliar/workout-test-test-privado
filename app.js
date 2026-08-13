@@ -158,6 +158,7 @@
     clearBtn: document.getElementById("clear-btn"),
     settingsClose: document.getElementById("settings-close"),
     toast: document.getElementById("toast"),
+    app: document.getElementById("app"),
     defaultMark: document.getElementById("default-mark"),
     themeMark: document.getElementById("theme-mark"),
     themeBust: document.getElementById("theme-bust"),
@@ -264,7 +265,7 @@
   let deferredPrompt = null;
   let toastTimer = 0;
   let modalMode = "quick";
-  let tray = { open: false, dragging: false, startY: 0, moved: false };
+  let tray = { open: false, dragging: false, startY: 0, moved: false, ignoreClick: false, pointerId: null };
 
   function remainingNow() {
     const live = state.live;
@@ -566,17 +567,27 @@
 
   function setTrayOpen(open) {
     tray.open = open;
-    els.themeTray.hidden = false;
+    tray.dragging = false;
     els.themeTray.classList.toggle("is-open", open);
     els.themeHandle.classList.toggle("is-open", open);
     els.themeHandle.setAttribute("aria-expanded", String(open));
     els.themeTray.style.maxHeight = "";
     els.themeTray.style.opacity = "";
-    if (!open) {
-      window.setTimeout(() => {
-        if (!tray.open) els.themeTray.hidden = true;
-      }, 280);
+  }
+
+  function canUseTray() {
+    return state.live.status !== "running";
+  }
+
+  function eventInPullZone(event) {
+    const target = event.target;
+    if (!(target instanceof Element)) return false;
+    if (target.closest("#theme-handle, #theme-row, #settings-btn, #settings, #modal, .tab, #timer-btn, .movement, .btn, .stat")) {
+      return false;
     }
+    if (target.closest(".top, .theme-tray")) return true;
+    const top = els.app.getBoundingClientRect().top;
+    return event.clientY - top < 180;
   }
 
   function toggleTimer() {
@@ -737,39 +748,71 @@
     setTrayOpen(false);
   });
 
-  els.themeHandle.addEventListener("pointerdown", (event) => {
-    if (state.live.status === "running") return;
-    if (event.pointerType === "mouse" && event.button !== 0) return;
-    tray.dragging = true;
-    tray.moved = false;
-    tray.startY = event.clientY;
-    els.themeTray.hidden = false;
-    els.themeHandle.setPointerCapture(event.pointerId);
-  });
-
-  els.themeHandle.addEventListener("pointermove", (event) => {
-    if (!tray.dragging) return;
-    const delta = event.clientY - tray.startY;
-    if (Math.abs(delta) > 6) tray.moved = true;
-    const base = tray.open ? 148 : 0;
-    const next = Math.max(0, Math.min(148, base + delta));
-    els.themeTray.style.maxHeight = `${next}px`;
-    els.themeTray.style.opacity = String(Math.min(1, next / 36));
-  });
-
-  function endTrayDrag() {
-    if (!tray.dragging) return;
-    tray.dragging = false;
-    const height = Number.parseFloat(els.themeTray.style.maxHeight || "0");
-    if (!tray.moved) {
-      setTrayOpen(!tray.open);
+  els.themeHandle.addEventListener("click", (event) => {
+    if (tray.ignoreClick) {
+      tray.ignoreClick = false;
+      event.preventDefault();
       return;
     }
-    setTrayOpen(height > 72);
+    if (!canUseTray()) return;
+    setTrayOpen(!tray.open);
+  });
+
+  function onTrayPointerDown(event) {
+    if (!canUseTray()) return;
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    if (event.target instanceof Element && event.target.closest("#theme-handle, #theme-row")) return;
+    if (!tray.open && !eventInPullZone(event)) return;
+    if (els.app.scrollTop > 4 && !tray.open) return;
+    tray.dragging = true;
+    tray.moved = false;
+    tray.ignoreClick = false;
+    tray.startY = event.clientY;
+    tray.startX = event.clientX;
+    tray.pointerId = event.pointerId;
   }
 
-  els.themeHandle.addEventListener("pointerup", endTrayDrag);
-  els.themeHandle.addEventListener("pointercancel", endTrayDrag);
+  function onTrayPointerUp(event) {
+    if (!tray.dragging) return;
+    if (tray.pointerId != null && event.pointerId != null && event.pointerId !== tray.pointerId) return;
+    tray.dragging = false;
+    tray.pointerId = null;
+    els.themeTray.classList.remove("is-dragging");
+    const height = Number.parseFloat(els.themeTray.style.maxHeight || "0");
+    if (!tray.moved || Number.isNaN(height)) return;
+    setTrayOpen(tray.open ? height > 90 : height > 56);
+  }
+
+  function onTrayPointerMove(event) {
+    if (!tray.dragging || event.pointerId !== tray.pointerId) return;
+    const delta = event.clientY - tray.startY;
+    const dx = event.clientX - tray.startX;
+    if (Math.abs(delta) < 24 && Math.abs(dx) < 24) return;
+    if (Math.abs(dx) > Math.abs(delta) + 8) {
+      tray.dragging = false;
+      return;
+    }
+    tray.moved = true;
+    tray.ignoreClick = true;
+    event.preventDefault();
+    const base = tray.open ? 148 : 0;
+    const next = Math.max(0, Math.min(148, base + delta));
+    els.themeTray.classList.add("is-dragging");
+    els.themeTray.style.maxHeight = `${next}px`;
+    els.themeTray.style.opacity = String(Math.min(1, next / 28));
+  }
+
+  els.app.addEventListener("pointerdown", onTrayPointerDown);
+  window.addEventListener("pointermove", onTrayPointerMove, { passive: false });
+  window.addEventListener("pointerup", onTrayPointerUp);
+  window.addEventListener("pointercancel", onTrayPointerUp);
+  els.app.addEventListener(
+    "touchmove",
+    (event) => {
+      if (tray.dragging && tray.moved) event.preventDefault();
+    },
+    { passive: false }
+  );
 
   let holdTimer = 0;
   let didHold = false;

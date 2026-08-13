@@ -10,12 +10,6 @@ const puppeteer = require("puppeteer-core");
   const page = await browser.newPage();
   await page.goto("http://127.0.0.1:8765/", { waitUntil: "domcontentloaded", timeout: 15000 });
 
-  await page.click("#theme-handle");
-  await page.waitForSelector('[data-theme-id="rick"]');
-  await page.click('[data-theme-id="rick"]');
-  const theme = await page.evaluate(() => document.documentElement.dataset.theme);
-  if (theme !== "rick") throw new Error(`expected rick theme, got ${theme}`);
-
   const startLabel = await page.$eval("#timer-label", (el) => el.textContent.trim());
   if (startLabel !== "Tap to start") throw new Error(`expected Tap to start, got ${startLabel}`);
 
@@ -55,6 +49,16 @@ const puppeteer = require("puppeteer-core");
   await page.click('.tab[data-view="log"]');
   const history = await page.$eval("#history", (el) => el.textContent);
   if (!history.includes("14")) throw new Error("history missing saved score");
+
+  await page.click("#theme-handle");
+  await page.waitForSelector("#theme-tray.is-open");
+  await page.waitForFunction(() => {
+    const chip = document.querySelector('[data-theme-id="rick"]');
+    return chip && chip.getBoundingClientRect().height > 40;
+  });
+  await page.$eval('[data-theme-id="rick"]', (el) => el.click());
+  const theme = await page.evaluate(() => document.documentElement.dataset.theme);
+  if (theme !== "rick") throw new Error(`expected rick theme, got ${theme}`);
 
   await page.screenshot({ path: "/tmp/amrap-log.png" });
   console.log("ui tests ok");

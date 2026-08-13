@@ -53,12 +53,14 @@ input:focus-visible {
   min-height: 100svh;
   max-height: 100svh;
   overflow: auto;
+  overscroll-behavior: contain;
   padding: calc(10px + var(--safe-top)) 16px calc(14px + var(--safe-bot));
   max-width: 480px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  touch-action: pan-y;
 }
 
 .install-banner {
@@ -89,6 +91,7 @@ input:focus-visible {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  touch-action: none;
 }
 
 .brand {
@@ -734,20 +737,24 @@ body,
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
   border: 0;
   background: transparent;
-  padding: 2px 8px 4px;
+  min-height: 44px;
+  padding: 8px 12px 10px;
   color: var(--muted);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  touch-action: none;
+  width: 100%;
 }
 
 .theme-handle-pill {
-  width: 36px;
-  height: 4px;
+  width: 44px;
+  height: 5px;
   border-radius: 999px;
   background: var(--line);
 }
@@ -766,9 +773,15 @@ body,
   overflow: hidden;
   max-height: 0;
   opacity: 0;
+  pointer-events: none;
   transition:
     max-height 0.28s ease,
     opacity 0.2s ease;
+}
+
+.theme-tray.is-open,
+.theme-tray.is-dragging {
+  pointer-events: auto;
 }
 
 .theme-tray.is-open {
