@@ -171,7 +171,6 @@
     bitCards: document.querySelectorAll(".bit-card"),
     bitLines: document.querySelectorAll(".bit-line"),
     bitKickers: document.querySelectorAll(".bit-kicker"),
-    brandSub: document.getElementById("brand-sub"),
     themeColorMeta: document.querySelector('meta[name="theme-color"]'),
   };
 
@@ -993,7 +992,7 @@
 
   if ("serviceWorker" in navigator) {
     let hadController = Boolean(navigator.serviceWorker.controller);
-    navigator.serviceWorker.register("./sw.js?v=16", { updateViaCache: "none" });
+    navigator.serviceWorker.register("./sw.js?v=17", { updateViaCache: "none" });
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (!hadController) {
         hadController = true;

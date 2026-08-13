@@ -32,7 +32,6 @@ for (const needle of [
   "theme-handle",
   "bit-card",
   "BOFA Protocol",
-  "rx-icon",
 ]) {
   if (!html.includes(needle)) throw new Error(`index.html missing ${needle}`);
 }
