@@ -50,13 +50,13 @@ const puppeteer = require("puppeteer-core");
   const history = await page.$eval("#history", (el) => el.textContent);
   if (!history.includes("14")) throw new Error("history missing saved score");
 
-  const line = await page.$eval("#bit-line", (el) => el.textContent.trim());
+  const line = await page.$eval(".view.is-active .bit-line", (el) => el.textContent.trim());
   if (!line) throw new Error("expected a rotating line under the log");
   if (!/deez nuts|Twenty minutes|clock/i.test(line)) {
     throw new Error(`unexpected opening line: ${line}`);
   }
-  await page.click("#bit-card");
-  const nextLine = await page.$eval("#bit-line", (el) => el.textContent.trim());
+  await page.$eval(".view.is-active .bit-card", (el) => el.click());
+  const nextLine = await page.$eval(".view.is-active .bit-line", (el) => el.textContent.trim());
   if (nextLine === line) throw new Error("tapping the line should rotate it");
 
   await page.click("#theme-handle");
