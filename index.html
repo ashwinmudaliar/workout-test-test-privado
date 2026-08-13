@@ -35,7 +35,7 @@
 
       <header class="top">
         <div class="brand">
-          <svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
+          <svg class="mark" id="default-mark" viewBox="0 0 64 64" aria-hidden="true">
             <g
               fill="none"
               stroke="currentColor"
@@ -63,9 +63,10 @@
               20
             </text>
           </svg>
+          <img id="theme-mark" class="theme-mark" alt="" hidden />
           <div>
             <h1>AMRAP</h1>
-            <p>5 · 10 · 15 · 20-min AMRAP</p>
+            <p id="brand-sub">5 · 10 · 15 · 20 min</p>
           </div>
         </div>
         <button type="button" id="settings-btn" class="icon-btn" aria-label="Settings">
@@ -77,6 +78,14 @@
           </svg>
         </button>
       </header>
+
+      <button type="button" id="theme-handle" class="theme-handle" aria-expanded="false" aria-controls="theme-tray">
+        <span class="theme-handle-pill"></span>
+        <span id="theme-handle-name">AMRAP</span>
+      </button>
+      <div id="theme-tray" class="theme-tray" hidden>
+        <div id="theme-row" class="theme-row" role="listbox" aria-label="Themes"></div>
+      </div>
 
       <section class="stats" aria-label="Benchmarks">
         <div class="stat">
@@ -102,6 +111,7 @@
         <section id="view-workout" class="view is-active">
           <div class="hero">
             <button type="button" class="timer-wrap" id="timer-btn" aria-label="Start workout">
+              <img id="theme-bust" class="theme-bust" alt="" hidden />
               <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
                 <circle class="ring-track" cx="60" cy="60" r="54" />
                 <circle id="ring-value" class="ring-value" cx="60" cy="60" r="54" />
@@ -213,7 +223,7 @@
         </div>
         <input id="import-file" type="file" accept="application/json" hidden />
         <p class="fine-print">
-          Scores stay on this device. Add AMRAP to your home screen for a one-tap gym timer.
+          Pull the handle for a character skin. Scores stay on this device.
         </p>
       </div>
     </div>

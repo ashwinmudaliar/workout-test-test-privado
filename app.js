@@ -6,6 +6,110 @@
   const WORKOUT_MS = 20 * 60 * 1000;
   const RING = 2 * Math.PI * 54;
   const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const THEMES = [
+    {
+      id: "amrap",
+      name: "AMRAP",
+      bg: "#070708",
+      labels: {
+        idle: "Tap to start",
+        running: "Tap to pause",
+        paused: "Tap to go",
+        finished: "Time",
+      },
+    },
+    {
+      id: "rick",
+      name: "Rick",
+      bust: "themes/rick/bust.jpg",
+      mark: "themes/rick/mark.jpg",
+      bg: "#0a1216",
+      labels: {
+        idle: "Do it",
+        running: "Keep going",
+        paused: "Get up",
+        finished: "Time",
+      },
+    },
+    {
+      id: "morty",
+      name: "Morty",
+      bust: "themes/morty/bust.jpg",
+      mark: "themes/morty/mark.jpg",
+      bg: "#14120c",
+      labels: {
+        idle: "Aw geez",
+        running: "Don't stop",
+        paused: "Oh man",
+        finished: "Time",
+      },
+    },
+    {
+      id: "beth",
+      name: "Beth",
+      bust: "themes/beth/bust.jpg",
+      mark: "themes/beth/mark.jpg",
+      bg: "#160d10",
+      labels: {
+        idle: "Let's go",
+        running: "Hold it",
+        paused: "Resume",
+        finished: "Time",
+      },
+    },
+    {
+      id: "space-beth",
+      name: "Space Beth",
+      bust: "themes/space-beth/bust.jpg",
+      mark: "themes/space-beth/mark.jpg",
+      bg: "#070b16",
+      labels: {
+        idle: "Execute",
+        running: "Stay sharp",
+        paused: "Hold",
+        finished: "Time",
+      },
+    },
+    {
+      id: "scary-terry",
+      name: "Scary Terry",
+      bust: "themes/scary-terry/bust.jpg",
+      mark: "themes/scary-terry/mark.jpg",
+      bg: "#090000",
+      labels: {
+        idle: "Tap, bitch",
+        running: "Don't stop",
+        paused: "Wake up",
+        finished: "Time",
+      },
+    },
+    {
+      id: "birdperson",
+      name: "Birdperson",
+      bust: "themes/birdperson/bust.jpg",
+      mark: "themes/birdperson/mark.jpg",
+      bg: "#120e0a",
+      labels: {
+        idle: "In due time",
+        running: "Endure",
+        paused: "Rest",
+        finished: "Time",
+      },
+    },
+    {
+      id: "evil-morty",
+      name: "Evil Morty",
+      bust: "themes/evil-morty/bust.jpg",
+      mark: "themes/evil-morty/mark.jpg",
+      bg: "#08080a",
+      labels: {
+        idle: "Begin",
+        running: "Continue",
+        paused: "Resume",
+        finished: "Time",
+      },
+    },
+  ];
 
   const els = {
     installBanner: document.getElementById("install-banner"),
@@ -54,6 +158,15 @@
     clearBtn: document.getElementById("clear-btn"),
     settingsClose: document.getElementById("settings-close"),
     toast: document.getElementById("toast"),
+    defaultMark: document.getElementById("default-mark"),
+    themeMark: document.getElementById("theme-mark"),
+    themeBust: document.getElementById("theme-bust"),
+    themeHandle: document.getElementById("theme-handle"),
+    themeHandleName: document.getElementById("theme-handle-name"),
+    themeTray: document.getElementById("theme-tray"),
+    themeRow: document.getElementById("theme-row"),
+    brandSub: document.getElementById("brand-sub"),
+    themeColorMeta: document.querySelector('meta[name="theme-color"]'),
   };
 
   const memoryStore = { value: null };
@@ -114,7 +227,7 @@
     const fallback = {
       workouts: {},
       live: defaultLive(),
-      settings: { sound: true, haptics: true },
+      settings: { sound: true, haptics: true, theme: "amrap" },
     };
     try {
       const raw = persist
@@ -125,7 +238,7 @@
       return {
         workouts: data.workouts || {},
         live: { ...defaultLive(), ...(data.live || {}) },
-        settings: { sound: true, haptics: true, ...(data.settings || {}) },
+        settings: { sound: true, haptics: true, theme: "amrap", ...(data.settings || {}) },
       };
     } catch {
       return fallback;
@@ -151,6 +264,7 @@
   let deferredPrompt = null;
   let toastTimer = 0;
   let modalMode = "quick";
+  let tray = { open: false, dragging: false, startY: 0, moved: false };
 
   function remainingNow() {
     const live = state.live;
@@ -363,12 +477,8 @@
     els.timerWrap.classList.toggle("is-low", remaining > 0 && remaining <= 60_000);
     els.timerWrap.classList.toggle("is-pulse", remaining > 0 && remaining <= 10_000);
     els.timerWrap.classList.toggle("is-paused", status === "paused");
-    const labels = {
-      idle: "Tap to start",
-      running: "Tap to pause",
-      paused: "Tap to go",
-      finished: "Time",
-    };
+    els.timerWrap.classList.toggle("is-running", status === "running");
+    const labels = currentTheme().labels;
     const caps = {
       idle: "20:00 cap",
       running: "hold to restart",
@@ -403,6 +513,70 @@
     const status = state.live.status;
     els.doneRow.hidden = status !== "finished";
     els.quickLogBtn.hidden = status === "running" || status === "finished";
+    const locked = status === "running";
+    els.themeHandle.classList.toggle("is-locked", locked);
+    if (locked) setTrayOpen(false);
+  }
+
+  function currentTheme() {
+    return THEMES.find((theme) => theme.id === state.settings.theme) || THEMES[0];
+  }
+
+  function renderThemeTray() {
+    const active = currentTheme().id;
+    els.themeRow.innerHTML = THEMES.map((theme) => {
+      const portrait = theme.mark
+        ? `<img src="${theme.mark}" alt="">`
+        : `<span class="theme-chip-fallback">20</span>`;
+      return `<button type="button" class="theme-chip${theme.id === active ? " is-active" : ""}" data-theme-id="${theme.id}" role="option" aria-selected="${theme.id === active}">
+        ${portrait}
+        <span>${theme.name}</span>
+      </button>`;
+    }).join("");
+  }
+
+  function applyTheme(id, announce = false) {
+    const theme = THEMES.find((item) => item.id === id) || THEMES[0];
+    state.settings.theme = theme.id;
+    document.documentElement.dataset.theme = theme.id;
+    if (els.themeColorMeta) els.themeColorMeta.content = theme.bg;
+    els.themeHandleName.textContent = theme.name;
+    if (theme.mark) {
+      els.themeMark.src = theme.mark;
+      els.themeMark.hidden = false;
+      els.defaultMark.hidden = true;
+    } else {
+      els.themeMark.hidden = true;
+      els.defaultMark.hidden = false;
+    }
+    if (theme.bust) {
+      els.themeBust.src = theme.bust;
+      els.themeBust.hidden = false;
+    } else {
+      els.themeBust.hidden = true;
+    }
+    renderThemeTray();
+    renderTimer();
+    save();
+    if (announce) {
+      toast(theme.id === "scary-terry" ? "Scary Terry, bitch" : theme.name);
+      buzz(16);
+    }
+  }
+
+  function setTrayOpen(open) {
+    tray.open = open;
+    els.themeTray.hidden = false;
+    els.themeTray.classList.toggle("is-open", open);
+    els.themeHandle.classList.toggle("is-open", open);
+    els.themeHandle.setAttribute("aria-expanded", String(open));
+    els.themeTray.style.maxHeight = "";
+    els.themeTray.style.opacity = "";
+    if (!open) {
+      window.setTimeout(() => {
+        if (!tray.open) els.themeTray.hidden = true;
+      }, 280);
+    }
   }
 
   function toggleTimer() {
@@ -555,6 +729,47 @@
 
   els.roundBtn.addEventListener("click", addRound);
   els.undoBtn.addEventListener("click", undoRound);
+
+  els.themeRow.addEventListener("click", (event) => {
+    const chip = event.target.closest("[data-theme-id]");
+    if (!chip) return;
+    applyTheme(chip.dataset.themeId, true);
+    setTrayOpen(false);
+  });
+
+  els.themeHandle.addEventListener("pointerdown", (event) => {
+    if (state.live.status === "running") return;
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    tray.dragging = true;
+    tray.moved = false;
+    tray.startY = event.clientY;
+    els.themeTray.hidden = false;
+    els.themeHandle.setPointerCapture(event.pointerId);
+  });
+
+  els.themeHandle.addEventListener("pointermove", (event) => {
+    if (!tray.dragging) return;
+    const delta = event.clientY - tray.startY;
+    if (Math.abs(delta) > 6) tray.moved = true;
+    const base = tray.open ? 148 : 0;
+    const next = Math.max(0, Math.min(148, base + delta));
+    els.themeTray.style.maxHeight = `${next}px`;
+    els.themeTray.style.opacity = String(Math.min(1, next / 36));
+  });
+
+  function endTrayDrag() {
+    if (!tray.dragging) return;
+    tray.dragging = false;
+    const height = Number.parseFloat(els.themeTray.style.maxHeight || "0");
+    if (!tray.moved) {
+      setTrayOpen(!tray.open);
+      return;
+    }
+    setTrayOpen(height > 72);
+  }
+
+  els.themeHandle.addEventListener("pointerup", endTrayDrag);
+  els.themeHandle.addEventListener("pointercancel", endTrayDrag);
 
   let holdTimer = 0;
   let didHold = false;
@@ -731,6 +946,7 @@
 
   reconcileLive();
   if (state.live.status === "running") loop();
+  applyTheme(state.settings.theme || "amrap");
   render();
   showInstall();
 })();

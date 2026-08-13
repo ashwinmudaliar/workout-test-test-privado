@@ -1,4 +1,4 @@
-const CACHE = "amrap-v1";
+const CACHE = "amrap-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -9,6 +9,20 @@ const ASSETS = [
   "./icons/icon-512.png",
   "./icons/apple-touch-icon.png",
   "./icons/favicon-32.png",
+  "./themes/rick/bust.jpg",
+  "./themes/rick/mark.jpg",
+  "./themes/morty/bust.jpg",
+  "./themes/morty/mark.jpg",
+  "./themes/beth/bust.jpg",
+  "./themes/beth/mark.jpg",
+  "./themes/space-beth/bust.jpg",
+  "./themes/space-beth/mark.jpg",
+  "./themes/scary-terry/bust.jpg",
+  "./themes/scary-terry/mark.jpg",
+  "./themes/birdperson/bust.jpg",
+  "./themes/birdperson/mark.jpg",
+  "./themes/evil-morty/bust.jpg",
+  "./themes/evil-morty/mark.jpg",
 ];
 
 self.addEventListener("install", (event) => {

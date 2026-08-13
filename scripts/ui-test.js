@@ -10,6 +10,12 @@ const puppeteer = require("puppeteer-core");
   const page = await browser.newPage();
   await page.goto("http://127.0.0.1:8765/", { waitUntil: "domcontentloaded", timeout: 15000 });
 
+  await page.click("#theme-handle");
+  await page.waitForSelector('[data-theme-id="rick"]');
+  await page.click('[data-theme-id="rick"]');
+  const theme = await page.evaluate(() => document.documentElement.dataset.theme);
+  if (theme !== "rick") throw new Error(`expected rick theme, got ${theme}`);
+
   const startLabel = await page.$eval("#timer-label", (el) => el.textContent.trim());
   if (startLabel !== "Tap to start") throw new Error(`expected Tap to start, got ${startLabel}`);
 
