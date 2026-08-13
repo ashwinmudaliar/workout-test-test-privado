@@ -21,7 +21,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <title>AMRAP</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=5" />
   </head>
   <body>
     <div id="app">
@@ -79,12 +79,9 @@
         </button>
       </header>
 
-      <button type="button" id="theme-handle" class="theme-handle" aria-expanded="false" aria-controls="theme-tray">
-        <span class="theme-handle-pill"></span>
-        <span>Skins · <span id="theme-handle-name">AMRAP</span></span>
-      </button>
       <div id="theme-tray" class="theme-tray">
-        <div id="theme-row" class="theme-row" role="listbox" aria-label="Themes"></div>
+        <p class="theme-hint">Tap a face · v5</p>
+        <div id="theme-row" class="theme-row" role="listbox" aria-label="Skins"></div>
       </div>
 
       <section class="stats" aria-label="Benchmarks">
@@ -223,12 +220,12 @@
         </div>
         <input id="import-file" type="file" accept="application/json" hidden />
         <p class="fine-print">
-          Pull the handle for a character skin. Scores stay on this device.
+          Tap a face for a character skin. Scores stay on this device.
         </p>
       </div>
     </div>
 
     <div id="toast" class="toast" hidden></div>
-    <script src="./app.js" defer></script>
+    <script src="./app.js?v=5" defer></script>
   </body>
 </html>

@@ -733,91 +733,42 @@ body,
   text-shadow: 0 1px 10px var(--bg);
 }
 
-.theme-handle {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border: 0;
-  background: transparent;
-  min-height: 44px;
-  padding: 8px 12px 10px;
-  color: var(--muted);
+.theme-tray {
+  margin: 0;
+}
+
+.theme-hint {
+  margin: 0 0 6px;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  touch-action: none;
-  width: 100%;
-}
-
-.theme-handle-pill {
-  width: 44px;
-  height: 5px;
-  border-radius: 999px;
-  background: var(--line);
-}
-
-.theme-handle.is-open .theme-handle-pill,
-.theme-handle:active .theme-handle-pill {
-  background: var(--accent);
-}
-
-.theme-handle.is-locked {
-  opacity: 0.35;
-  pointer-events: none;
-}
-
-.theme-tray {
-  overflow: hidden;
-  max-height: 0;
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    max-height 0.28s ease,
-    opacity 0.2s ease;
-}
-
-.theme-tray.is-open,
-.theme-tray.is-dragging {
-  pointer-events: auto;
-}
-
-.theme-tray.is-open {
-  max-height: 148px;
-  opacity: 1;
-  margin-bottom: 2px;
+  color: var(--muted);
 }
 
 .theme-row {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  padding: 4px 2px 10px;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-
-.theme-row::-webkit-scrollbar {
-  display: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .theme-chip {
-  flex: 0 0 auto;
-  width: 74px;
+  min-height: 44px;
   border: 1px solid var(--line);
   background: var(--bg-elev);
-  border-radius: 16px;
-  padding: 8px 6px 7px;
+  border-radius: 14px;
+  padding: 8px 4px 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+  text-align: center;
+  line-height: 1.15;
+  touch-action: manipulation;
 }
 
 .theme-chip img,

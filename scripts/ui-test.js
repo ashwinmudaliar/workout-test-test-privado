@@ -50,12 +50,7 @@ const puppeteer = require("puppeteer-core");
   const history = await page.$eval("#history", (el) => el.textContent);
   if (!history.includes("14")) throw new Error("history missing saved score");
 
-  await page.click("#theme-handle");
-  await page.waitForSelector("#theme-tray.is-open");
-  await page.waitForFunction(() => {
-    const chip = document.querySelector('[data-theme-id="rick"]');
-    return chip && chip.getBoundingClientRect().height > 40;
-  });
+  await page.waitForSelector('[data-theme-id="rick"]');
   await page.$eval('[data-theme-id="rick"]', (el) => el.click());
   const theme = await page.evaluate(() => document.documentElement.dataset.theme);
   if (theme !== "rick") throw new Error(`expected rick theme, got ${theme}`);

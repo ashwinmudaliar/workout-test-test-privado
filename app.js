@@ -162,8 +162,6 @@
     defaultMark: document.getElementById("default-mark"),
     themeMark: document.getElementById("theme-mark"),
     themeBust: document.getElementById("theme-bust"),
-    themeHandle: document.getElementById("theme-handle"),
-    themeHandleName: document.getElementById("theme-handle-name"),
     themeTray: document.getElementById("theme-tray"),
     themeRow: document.getElementById("theme-row"),
     brandSub: document.getElementById("brand-sub"),
@@ -265,7 +263,6 @@
   let deferredPrompt = null;
   let toastTimer = 0;
   let modalMode = "quick";
-  let tray = { open: false, dragging: false, startY: 0, moved: false, ignoreClick: false, pointerId: null };
 
   function remainingNow() {
     const live = state.live;
@@ -514,9 +511,6 @@
     const status = state.live.status;
     els.doneRow.hidden = status !== "finished";
     els.quickLogBtn.hidden = status === "running" || status === "finished";
-    const locked = status === "running";
-    els.themeHandle.classList.toggle("is-locked", locked);
-    if (locked) setTrayOpen(false);
   }
 
   function currentTheme() {
@@ -541,7 +535,6 @@
     state.settings.theme = theme.id;
     document.documentElement.dataset.theme = theme.id;
     if (els.themeColorMeta) els.themeColorMeta.content = theme.bg;
-    els.themeHandleName.textContent = theme.name;
     if (theme.mark) {
       els.themeMark.src = theme.mark;
       els.themeMark.hidden = false;
@@ -563,31 +556,6 @@
       toast(theme.id === "scary-terry" ? "Scary Terry, bitch" : theme.name);
       buzz(16);
     }
-  }
-
-  function setTrayOpen(open) {
-    tray.open = open;
-    tray.dragging = false;
-    els.themeTray.classList.toggle("is-open", open);
-    els.themeHandle.classList.toggle("is-open", open);
-    els.themeHandle.setAttribute("aria-expanded", String(open));
-    els.themeTray.style.maxHeight = "";
-    els.themeTray.style.opacity = "";
-  }
-
-  function canUseTray() {
-    return state.live.status !== "running";
-  }
-
-  function eventInPullZone(event) {
-    const target = event.target;
-    if (!(target instanceof Element)) return false;
-    if (target.closest("#theme-handle, #theme-row, #settings-btn, #settings, #modal, .tab, #timer-btn, .movement, .btn, .stat")) {
-      return false;
-    }
-    if (target.closest(".top, .theme-tray")) return true;
-    const top = els.app.getBoundingClientRect().top;
-    return event.clientY - top < 180;
   }
 
   function toggleTimer() {
@@ -745,74 +713,7 @@
     const chip = event.target.closest("[data-theme-id]");
     if (!chip) return;
     applyTheme(chip.dataset.themeId, true);
-    setTrayOpen(false);
   });
-
-  els.themeHandle.addEventListener("click", (event) => {
-    if (tray.ignoreClick) {
-      tray.ignoreClick = false;
-      event.preventDefault();
-      return;
-    }
-    if (!canUseTray()) return;
-    setTrayOpen(!tray.open);
-  });
-
-  function onTrayPointerDown(event) {
-    if (!canUseTray()) return;
-    if (event.pointerType === "mouse" && event.button !== 0) return;
-    if (event.target instanceof Element && event.target.closest("#theme-handle, #theme-row")) return;
-    if (!tray.open && !eventInPullZone(event)) return;
-    if (els.app.scrollTop > 4 && !tray.open) return;
-    tray.dragging = true;
-    tray.moved = false;
-    tray.ignoreClick = false;
-    tray.startY = event.clientY;
-    tray.startX = event.clientX;
-    tray.pointerId = event.pointerId;
-  }
-
-  function onTrayPointerUp(event) {
-    if (!tray.dragging) return;
-    if (tray.pointerId != null && event.pointerId != null && event.pointerId !== tray.pointerId) return;
-    tray.dragging = false;
-    tray.pointerId = null;
-    els.themeTray.classList.remove("is-dragging");
-    const height = Number.parseFloat(els.themeTray.style.maxHeight || "0");
-    if (!tray.moved || Number.isNaN(height)) return;
-    setTrayOpen(tray.open ? height > 90 : height > 56);
-  }
-
-  function onTrayPointerMove(event) {
-    if (!tray.dragging || event.pointerId !== tray.pointerId) return;
-    const delta = event.clientY - tray.startY;
-    const dx = event.clientX - tray.startX;
-    if (Math.abs(delta) < 24 && Math.abs(dx) < 24) return;
-    if (Math.abs(dx) > Math.abs(delta) + 8) {
-      tray.dragging = false;
-      return;
-    }
-    tray.moved = true;
-    tray.ignoreClick = true;
-    event.preventDefault();
-    const base = tray.open ? 148 : 0;
-    const next = Math.max(0, Math.min(148, base + delta));
-    els.themeTray.classList.add("is-dragging");
-    els.themeTray.style.maxHeight = `${next}px`;
-    els.themeTray.style.opacity = String(Math.min(1, next / 28));
-  }
-
-  els.app.addEventListener("pointerdown", onTrayPointerDown);
-  window.addEventListener("pointermove", onTrayPointerMove, { passive: false });
-  window.addEventListener("pointerup", onTrayPointerUp);
-  window.addEventListener("pointercancel", onTrayPointerUp);
-  els.app.addEventListener(
-    "touchmove",
-    (event) => {
-      if (tray.dragging && tray.moved) event.preventDefault();
-    },
-    { passive: false }
-  );
 
   let holdTimer = 0;
   let didHold = false;
@@ -984,7 +885,12 @@
   });
 
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js");
+    navigator.serviceWorker.register("./sw.js?v=5", { updateViaCache: "none" });
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (window.__amrapReloaded) return;
+      window.__amrapReloaded = true;
+      location.reload();
+    });
   }
 
   reconcileLive();

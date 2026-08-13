@@ -12,6 +12,8 @@ const required = [
   "icons/icon-192.png",
   "icons/icon-512.png",
   "icons/apple-touch-icon.png",
+  "themes/rick/mark.jpg",
+  "themes/rick/bust.jpg",
 ];
 
 for (const file of required) {
