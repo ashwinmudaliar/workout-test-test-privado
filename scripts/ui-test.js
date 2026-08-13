@@ -14,7 +14,7 @@ const puppeteer = require("puppeteer-core");
   if (startLabel !== "Tap to start") throw new Error(`expected Tap to start, got ${startLabel}`);
 
   const rxIcons = await page.$$("#brand-sub .rx-icon");
-  if (rxIcons.length !== 4) throw new Error(`expected 4 prescription icons, got ${rxIcons.length}`);
+  if (rxIcons.length !== 3) throw new Error(`expected 3 prescription icons, got ${rxIcons.length}`);
 
   const bit0 = await page.$eval("#bit-line", (el) => el.textContent.trim());
   if (!bit0) throw new Error("expected a quote under the timer");

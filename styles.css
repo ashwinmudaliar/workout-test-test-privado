@@ -91,25 +91,40 @@ input:focus-visible {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
   touch-action: none;
 }
 
 .brand {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
+  flex: 1;
+  min-width: 0;
 }
 
-.mark {
-  width: 42px;
-  height: 42px;
+.mark,
+.theme-mark {
+  width: 64px;
+  height: 64px;
   color: var(--accent);
   flex-shrink: 0;
 }
 
+.theme-mark {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent);
+}
+
+.brand-copy {
+  flex: 1;
+  min-width: 0;
+}
+
 .brand h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 22px;
   letter-spacing: -0.04em;
   line-height: 1;
 }
@@ -125,31 +140,24 @@ input:focus-visible {
 .brand-sub {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 6px 0 0;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 8px 0 0;
   color: var(--muted);
   text-transform: none;
   letter-spacing: 0;
 }
 
 .rx-icon {
-  width: 22px;
-  height: 22px;
+  width: 30px;
+  height: 30px;
   display: block;
+  flex: 0 0 auto;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
-}
-
-.rx-dot {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.4;
-  flex-shrink: 0;
 }
 
 .icon-btn {
@@ -764,15 +772,6 @@ body,
     background-color 0.32s ease,
     color 0.32s ease,
     border-color 0.32s ease;
-}
-
-.theme-mark {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--accent);
-  flex-shrink: 0;
 }
 
 .theme-bust {
