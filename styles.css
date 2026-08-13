@@ -97,26 +97,23 @@ input:focus-visible {
 
 .brand {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
   flex: 1;
   min-width: 0;
 }
 
 .theme-mark {
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   flex-shrink: 0;
-}
-
-.theme-mark {
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--accent);
 }
 
 .brand-copy {
-  flex: 1;
+  flex: 0 1 auto;
   min-width: 0;
 }
 
@@ -138,22 +135,23 @@ input:focus-visible {
 .brand-sub {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin: 8px 0 0;
-  color: var(--muted);
+  justify-content: flex-start;
+  gap: 10px;
+  width: max-content;
+  margin: 6px 0 0;
+  color: var(--text);
   text-transform: none;
   letter-spacing: 0;
 }
 
 .rx-icon {
-  width: 30px;
-  height: 30px;
+  width: 22px;
+  height: 22px;
   display: block;
   flex: 0 0 auto;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.7;
+  stroke-width: 1.75;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
