@@ -3,8 +3,8 @@
   --bg-elev: #121214;
   --bg-elev-2: #1b1b1f;
   --line: #2a2a2e;
-  --lime: #c8ff00;
-  --lime-ink: #121400;
+  --accent: #c8ff00;
+  --accent-ink: #121400;
   --text: #f3f3f0;
   --muted: #8d8d93;
   --danger: #ff4d3a;
@@ -45,7 +45,7 @@ input {
 
 button:focus-visible,
 input:focus-visible {
-  outline: 2px solid var(--lime);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -100,7 +100,7 @@ input:focus-visible {
 .mark {
   width: 42px;
   height: 42px;
-  color: var(--lime);
+  color: var(--accent);
   flex-shrink: 0;
 }
 
@@ -148,10 +148,6 @@ input:focus-visible {
   padding: 8px 10px;
 }
 
-.stat.tom {
-  border-color: color-mix(in srgb, var(--lime) 35%, var(--line));
-}
-
 .stat-label,
 .rounds-label,
 .timer-label,
@@ -164,8 +160,7 @@ input:focus-visible {
   font-size: 11px;
 }
 
-.stat strong,
-.streak {
+.stat strong {
   display: block;
   margin-top: 4px;
   font-size: 22px;
@@ -238,7 +233,7 @@ input:focus-visible {
 }
 
 .timer-wrap.is-paused .ring-value {
-  stroke: color-mix(in srgb, var(--lime) 45%, #666);
+  stroke: color-mix(in srgb, var(--accent) 45%, #666);
 }
 
 .timer-wrap.is-paused .clock {
@@ -262,7 +257,7 @@ input:focus-visible {
 }
 
 .ring-value {
-  stroke: var(--lime);
+  stroke: var(--accent);
   stroke-linecap: round;
   transform: rotate(-90deg);
   transform-origin: 50% 50%;
@@ -329,7 +324,7 @@ input:focus-visible {
 .movement .reps {
   font-size: 20px;
   font-weight: 700;
-  color: var(--lime);
+  color: var(--accent);
   letter-spacing: -0.04em;
 }
 
@@ -350,8 +345,8 @@ input:focus-visible {
 }
 
 .movement.is-done .check {
-  background: var(--lime);
-  border-color: var(--lime);
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 .movement.is-done .check::after {
@@ -361,7 +356,7 @@ input:focus-visible {
   top: 1px;
   width: 5px;
   height: 9px;
-  border: solid var(--lime-ink);
+  border: solid var(--accent-ink);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
@@ -423,8 +418,8 @@ input:focus-visible {
 
 .btn.lime,
 .btn.primary {
-  background: var(--lime);
-  color: var(--lime-ink);
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 .btn.ghost {
@@ -460,16 +455,11 @@ input:focus-visible {
 }
 
 .log-hero {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: flex-end;
+  margin: 0;
 }
 
-.holland-note {
+.log-note {
   margin: 0;
-  max-width: 180px;
-  text-align: right;
   color: var(--muted);
   font-size: 13px;
   line-height: 1.4;
@@ -518,7 +508,7 @@ input:focus-visible {
 }
 
 .chart-bar.has-score {
-  background: var(--lime);
+  background: var(--accent);
 }
 
 .chart-bar.is-today {
@@ -528,14 +518,6 @@ input:focus-visible {
 .chart-col span {
   font-size: 10px;
   color: var(--muted);
-}
-
-.tom-line {
-  position: absolute;
-  left: 0;
-  right: 0;
-  border-top: 1px dashed color-mix(in srgb, var(--lime) 55%, transparent);
-  pointer-events: none;
 }
 
 .history {
@@ -573,7 +555,7 @@ input:focus-visible {
 }
 
 .history .score.pb {
-  color: var(--lime);
+  color: var(--accent);
 }
 
 .empty {
@@ -654,8 +636,8 @@ input:focus-visible {
   left: 50%;
   bottom: calc(24px + var(--safe-bot));
   transform: translateX(-50%);
-  background: var(--lime);
-  color: var(--lime-ink);
+  background: var(--accent);
+  color: var(--accent-ink);
   padding: 12px 16px;
   border-radius: 999px;
   font-weight: 700;

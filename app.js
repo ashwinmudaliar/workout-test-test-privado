@@ -1,9 +1,10 @@
 (() => {
-  const STORAGE_KEY = "cindy-tracker-v1";
-  const INSTALL_KEY = "cindy-install-dismissed";
+  const STORAGE_KEY = "amrap-tracker-v1";
+  const LEGACY_STORAGE_KEY = "cindy-tracker-v1";
+  const INSTALL_KEY = "amrap-install-dismissed";
+  const LEGACY_INSTALL_KEY = "cindy-install-dismissed";
   const WORKOUT_MS = 20 * 60 * 1000;
   const RING = 2 * Math.PI * 54;
-  const TOM = 27;
   const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const els = {
@@ -14,6 +15,7 @@
     settingsBtn: document.getElementById("settings-btn"),
     statToday: document.getElementById("stat-today"),
     statPb: document.getElementById("stat-pb"),
+    statStreak: document.getElementById("stat-streak"),
     tabs: document.querySelectorAll(".tab"),
     views: {
       workout: document.getElementById("view-workout"),
@@ -32,9 +34,7 @@
     saveBtn: document.getElementById("save-btn"),
     discardBtn: document.getElementById("discard-btn"),
     quickLogBtn: document.getElementById("quick-log-btn"),
-    streak: document.getElementById("streak"),
-    hollandNote: document.getElementById("holland-note"),
-    tomLine: document.getElementById("tom-line"),
+    logNote: document.getElementById("log-note"),
     chart: document.getElementById("chart"),
     history: document.getElementById("history"),
     modal: document.getElementById("modal"),
@@ -60,8 +60,8 @@
 
   function canStore() {
     try {
-      localStorage.setItem("__cindy", "1");
-      localStorage.removeItem("__cindy");
+      localStorage.setItem("__amrap", "1");
+      localStorage.removeItem("__amrap");
       return true;
     } catch {
       return false;
@@ -117,7 +117,9 @@
       settings: { sound: true, haptics: true },
     };
     try {
-      const raw = persist ? localStorage.getItem(STORAGE_KEY) : memoryStore.value;
+      const raw = persist
+        ? localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY)
+        : memoryStore.value;
       if (!raw) return fallback;
       const data = JSON.parse(raw);
       return {
@@ -136,8 +138,10 @@
       live: state.live,
       settings: state.settings,
     });
-    if (persist) localStorage.setItem(STORAGE_KEY, payload);
-    else memoryStore.value = payload;
+    if (persist) {
+      localStorage.setItem(STORAGE_KEY, payload);
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+    } else memoryStore.value = payload;
   }
 
   const state = load();
@@ -330,13 +334,7 @@
     };
     save();
     render();
-    if (rounds > previous && rounds > 0) {
-      toast(
-        rounds >= TOM
-          ? `New PR: ${rounds}. That’s Tom territory.`
-          : `New personal best: ${rounds}`
-      );
-    } else if (rounds >= TOM) toast("You matched Tom Holland.");
+    if (rounds > previous && rounds > 0) toast(`New personal best: ${rounds}`);
     else toast(`Saved ${rounds} round${rounds === 1 ? "" : "s"}`);
   }
 
@@ -419,23 +417,14 @@
     const pb = personalBest();
     els.statPb.textContent = pb ? String(pb) : "—";
     const days = streak();
-    els.streak.textContent = `${days} day${days === 1 ? "" : "s"}`;
-    const note = pb >= TOM
-      ? pb > TOM
-        ? `You passed Tom’s 27. Best: ${pb}.`
-        : "You matched Tom Holland’s 27."
-      : pb
-        ? `${TOM - pb} round${TOM - pb === 1 ? "" : "s"} behind Tom’s 27.`
-        : "Tom Holland’s record: 27 rounds. Chase it.";
-    els.hollandNote.textContent = note;
+    els.statStreak.textContent = String(days);
   }
 
   function renderChart() {
     const today = todayKey();
     const keys = [];
     for (let i = 13; i >= 0; i -= 1) keys.push(shiftDate(today, -i));
-    const max = Math.max(TOM, ...keys.map((key) => state.workouts[key]?.rounds || 0), 1);
-    els.tomLine.style.bottom = `${(TOM / max) * 100}%`;
+    const max = Math.max(...keys.map((key) => state.workouts[key]?.rounds || 0), 1);
     els.chart.innerHTML = keys
       .map((key) => {
         const rounds = state.workouts[key]?.rounds || 0;
@@ -455,7 +444,7 @@
     const pb = personalBest();
     if (!items.length) {
       els.history.innerHTML =
-        '<li class="empty">No Cindys yet. 5 pull-ups, 10 push-ups, 15 squats. As many rounds as possible in 20 minutes.</li>';
+        '<li class="empty">No sessions yet. 5 pull-ups, 10 push-ups, 15 squats. As many rounds as possible in 20 minutes.</li>';
       return;
     }
     els.history.innerHTML = items
@@ -494,7 +483,7 @@
   function openModal(mode, startValue) {
     modalMode = mode;
     els.stepValue.value = String(startValue);
-    els.modalTitle.textContent = mode === "save" ? "Save today’s Cindy" : "Log rounds";
+    els.modalTitle.textContent = mode === "save" ? "Save today’s score" : "Log rounds";
     els.modalCopy.textContent =
       mode === "save"
         ? "Confirm full rounds completed before time expired."
@@ -510,7 +499,7 @@
 
   function confirmReplaceToday() {
     if (!state.workouts[todayKey()]) return true;
-    return window.confirm("You already logged Cindy today. Replace that score?");
+    return window.confirm("You already logged a score today. Replace it?");
   }
 
   function applyModalSave() {
@@ -532,7 +521,7 @@
   }
 
   function showInstall() {
-    if (localStorage.getItem(INSTALL_KEY)) return;
+    if (localStorage.getItem(INSTALL_KEY) || localStorage.getItem(LEGACY_INSTALL_KEY)) return;
     const standalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       window.navigator.standalone === true;
@@ -543,7 +532,7 @@
       els.installCopy.textContent = "On iPhone: Share → Add to Home Screen.";
       els.installBtn.hidden = true;
     } else if (deferredPrompt) {
-      els.installCopy.textContent = "Install Cindy for a home-screen timer.";
+      els.installCopy.textContent = "Install AMRAP for a home-screen timer.";
       els.installBtn.hidden = false;
     } else {
       els.installCopy.textContent = "Add this page to your home screen for gym use.";
@@ -653,7 +642,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "cindy-log.json";
+    a.download = "amrap-log.json";
     a.click();
     URL.revokeObjectURL(url);
   });
@@ -676,7 +665,7 @@
   });
 
   els.clearBtn.addEventListener("click", () => {
-    if (!window.confirm("Clear every saved Cindy? This cannot be undone.")) return;
+    if (!window.confirm("Clear every saved session? This cannot be undone.")) return;
     state.workouts = {};
     save();
     render();

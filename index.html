@@ -10,17 +10,17 @@
     <meta name="color-scheme" content="dark" />
     <meta
       name="description"
-      content="Track CrossFit Cindy every day: 5 pull-ups, 10 push-ups, 15 squats. 20-minute AMRAP with a home-screen timer."
+      content="Track a 20-minute AMRAP every day: 5 pull-ups, 10 push-ups, 15 squats."
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Cindy" />
-    <meta name="application-name" content="Cindy" />
+    <meta name="apple-mobile-web-app-title" content="AMRAP" />
+    <meta name="application-name" content="AMRAP" />
     <link rel="manifest" href="./manifest.json" />
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
-    <title>Cindy</title>
+    <title>AMRAP</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -53,19 +53,18 @@
             </g>
             <text
               x="32"
-              y="42"
+              y="40"
               text-anchor="middle"
               fill="currentColor"
-              font-size="34"
+              font-size="18"
               font-weight="800"
               font-family="Arial Black, Helvetica Neue, sans-serif"
-              font-style="italic"
             >
-              C
+              20
             </text>
           </svg>
           <div>
-            <h1>Cindy</h1>
+            <h1>AMRAP</h1>
             <p>5 · 10 · 15 · 20-min AMRAP</p>
           </div>
         </div>
@@ -88,9 +87,9 @@
           <span class="stat-label">Best</span>
           <strong id="stat-pb">—</strong>
         </div>
-        <div class="stat tom">
-          <span class="stat-label">Tom</span>
-          <strong>27</strong>
+        <div class="stat">
+          <span class="stat-label">Streak</span>
+          <strong id="stat-streak">0</strong>
         </div>
       </section>
 
@@ -162,21 +161,15 @@
 
         <section id="view-log" class="view">
           <div class="log-hero">
-            <div>
-              <p class="stat-label">Streak</p>
-              <p id="streak" class="streak">0 days</p>
-            </div>
-            <p id="holland-note" class="holland-note">
-              Tom Holland’s record: 27 rounds. Chase it.
+            <p id="log-note" class="log-note">
+              5 pull-ups, 10 push-ups, 15 squats. As many rounds as possible.
             </p>
           </div>
           <div class="chart-card">
             <div class="chart-head">
               <span>Last 14 days</span>
-              <span class="muted">Tom’s 27</span>
             </div>
             <div class="chart-frame">
-              <div id="tom-line" class="tom-line"></div>
               <div id="chart" class="chart"></div>
             </div>
           </div>
@@ -220,7 +213,7 @@
         </div>
         <input id="import-file" type="file" accept="application/json" hidden />
         <p class="fine-print">
-          Scores stay on this device. Add Cindy to your home screen for a one-tap gym timer.
+          Scores stay on this device. Add AMRAP to your home screen for a one-tap gym timer.
         </p>
       </div>
     </div>

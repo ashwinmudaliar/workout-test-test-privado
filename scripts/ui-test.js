@@ -42,7 +42,7 @@ const puppeteer = require("puppeteer-core");
   await page.click("#modal-save");
   await page.waitForFunction(() => document.querySelector("#stat-today").textContent.trim() === "14");
 
-  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem("cindy-tracker-v1")));
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem("amrap-tracker-v1")));
   const today = Object.values(stored.workouts)[0];
   if (!today || today.rounds !== 14) throw new Error("workout was not saved");
 
@@ -50,7 +50,7 @@ const puppeteer = require("puppeteer-core");
   const history = await page.$eval("#history", (el) => el.textContent);
   if (!history.includes("14")) throw new Error("history missing saved score");
 
-  await page.screenshot({ path: "/tmp/cindy-log.png" });
+  await page.screenshot({ path: "/tmp/amrap-log.png" });
   console.log("ui tests ok");
   await browser.close();
 })().catch(async (error) => {
