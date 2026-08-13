@@ -28,6 +28,8 @@ for (const needle of [
   "Pull-ups",
   "Push-ups",
   "Squats",
+  "theme-handle",
+  "bit-card",
 ]) {
   if (!html.includes(needle)) throw new Error(`index.html missing ${needle}`);
 }

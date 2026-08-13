@@ -50,10 +50,20 @@ const puppeteer = require("puppeteer-core");
   const history = await page.$eval("#history", (el) => el.textContent);
   if (!history.includes("14")) throw new Error("history missing saved score");
 
+  const line = await page.$eval("#bit-line", (el) => el.textContent.trim());
+  if (!line) throw new Error("expected a rotating line under the log");
+  await page.click("#bit-card");
+  const nextLine = await page.$eval("#bit-line", (el) => el.textContent.trim());
+  if (nextLine === line) throw new Error("tapping the line should rotate it");
+
+  await page.click("#theme-handle");
+  await page.waitForFunction(() => document.querySelector("#theme-tray").classList.contains("is-open"));
   await page.waitForSelector('[data-theme-id="rick"]');
   await page.$eval('[data-theme-id="rick"]', (el) => el.click());
   const theme = await page.evaluate(() => document.documentElement.dataset.theme);
   if (theme !== "rick") throw new Error(`expected rick theme, got ${theme}`);
+  const trayClosed = await page.$eval("#theme-tray", (el) => !el.classList.contains("is-open"));
+  if (!trayClosed) throw new Error("picking a skin should close the tray");
 
   await page.screenshot({ path: "/tmp/amrap-log.png" });
   console.log("ui tests ok");

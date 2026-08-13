@@ -111,6 +111,31 @@
     },
   ];
 
+  const LINES = [
+    "Twenty minutes. Everything after that is optional.",
+    "The clock does not care how you feel. That’s the gift.",
+    "A streak is just yesterday agreeing with today.",
+    "You cannot think your way into the first pull-up.",
+    "Nobody will clap. Do it anyway.",
+    "Start ugly. Finish on the clock.",
+    "You thought this was a workout app. That’s act one. The sunken place is deez nuts.",
+    "There is a you who skipped today. He lives downstairs. He is tending deez nuts.",
+    "The committee met in the dark. Unanimous. The motion carries: deez nuts.",
+    "Don’t look at the spectacle. The thing that looks back is deez nuts.",
+    "Get out of the story where you’re too tired. The exit is marked deez nuts.",
+    "They built a copy of you under the house. The original was always deez nuts.",
+    "Every system protects itself. This one protects deez nuts.",
+    "You came for discipline. Cute. The twist was deez nuts from page one.",
+    "The audience thinks they’re watching you suffer. They’re watching deez nuts.",
+    "I saved you a seat in the sunken place. Refreshments are deez nuts.",
+    "The tethered aren’t angry. They’re disappointed you forgot deez nuts.",
+    "Credits roll. The monster takes off the mask. It’s deez nuts. You clap anyway.",
+    "They hypnotized you with rest-day logic. Snap out. Also, deez nuts.",
+    "A quiet neighborhood. A perfect streak. A basement full of deez nuts.",
+    "You wanted a sign. The universe sent a teacup, a deer, and deez nuts.",
+    "The horror isn’t the twenty minutes. The horror is realizing it was deez nuts.",
+  ];
+
   const els = {
     installBanner: document.getElementById("install-banner"),
     installCopy: document.getElementById("install-copy"),
@@ -163,7 +188,11 @@
     themeMark: document.getElementById("theme-mark"),
     themeBust: document.getElementById("theme-bust"),
     themeTray: document.getElementById("theme-tray"),
+    themeHandle: document.getElementById("theme-handle"),
+    themeHandleLabel: document.getElementById("theme-handle-label"),
     themeRow: document.getElementById("theme-row"),
+    bitCard: document.getElementById("bit-card"),
+    bitLine: document.getElementById("bit-line"),
     brandSub: document.getElementById("brand-sub"),
     themeColorMeta: document.querySelector('meta[name="theme-color"]'),
   };
@@ -513,6 +542,28 @@
     els.quickLogBtn.hidden = status === "running" || status === "finished";
   }
 
+  let trayOpen = false;
+  let trayDrag = null;
+  let trayHandled = false;
+  let bitShift = 0;
+
+  function setTrayOpen(open) {
+    trayOpen = Boolean(open);
+    els.themeTray.classList.toggle("is-open", trayOpen);
+    els.themeHandle.setAttribute("aria-expanded", trayOpen ? "true" : "false");
+    els.themeHandleLabel.textContent = trayOpen ? "Tap a face" : "Skins";
+  }
+
+  function dayLineIndex() {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    return Math.floor((now - start) / 86400000);
+  }
+
+  function renderBit() {
+    els.bitLine.textContent = LINES[(dayLineIndex() + bitShift) % LINES.length];
+  }
+
   function currentTheme() {
     return THEMES.find((theme) => theme.id === state.settings.theme) || THEMES[0];
   }
@@ -553,6 +604,7 @@
     renderTimer();
     save();
     if (announce) {
+      setTrayOpen(false);
       toast(theme.id === "scary-terry" ? "Scary Terry, bitch" : theme.name);
       buzz(16);
     }
@@ -631,6 +683,7 @@
     renderChart();
     renderHistory();
     renderSettings();
+    renderBit();
   }
 
   function openModal(mode, startValue) {
@@ -713,6 +766,58 @@
     const chip = event.target.closest("[data-theme-id]");
     if (!chip) return;
     applyTheme(chip.dataset.themeId, true);
+  });
+
+  els.themeHandle.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    trayDrag = { id: event.pointerId, y: event.clientY, dragged: false };
+    try {
+      els.themeHandle.setPointerCapture(event.pointerId);
+    } catch {
+      /* older iOS */
+    }
+  });
+  els.themeHandle.addEventListener("pointermove", (event) => {
+    if (!trayDrag || event.pointerId !== trayDrag.id) return;
+    if (Math.abs(event.clientY - trayDrag.y) > 10) trayDrag.dragged = true;
+  });
+  function endTrayDrag(event) {
+    if (!trayDrag || event.pointerId !== trayDrag.id) return;
+    const dy = event.clientY - trayDrag.y;
+    const dragged = trayDrag.dragged;
+    trayDrag = null;
+    trayHandled = true;
+    if (dragged) {
+      if (dy > 28) setTrayOpen(true);
+      else if (dy < -28) setTrayOpen(false);
+      return;
+    }
+    setTrayOpen(!trayOpen);
+  }
+  els.themeHandle.addEventListener("pointerup", endTrayDrag);
+  els.themeHandle.addEventListener("pointercancel", () => {
+    trayDrag = null;
+  });
+  els.themeHandle.addEventListener(
+    "touchmove",
+    (event) => {
+      event.preventDefault();
+    },
+    { passive: false }
+  );
+  els.themeHandle.addEventListener("click", (event) => {
+    if (trayHandled) {
+      event.preventDefault();
+      trayHandled = false;
+      return;
+    }
+    setTrayOpen(!trayOpen);
+  });
+
+  els.bitCard.addEventListener("click", () => {
+    bitShift += 1;
+    renderBit();
+    buzz(8);
   });
 
   let holdTimer = 0;
@@ -886,7 +991,7 @@
 
   if ("serviceWorker" in navigator) {
     let hadController = Boolean(navigator.serviceWorker.controller);
-    navigator.serviceWorker.register("./sw.js?v=5", { updateViaCache: "none" });
+    navigator.serviceWorker.register("./sw.js?v=6", { updateViaCache: "none" });
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (!hadController) {
         hadController = true;

@@ -21,7 +21,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <title>AMRAP</title>
-    <link rel="stylesheet" href="./styles.css?v=5" />
+    <link rel="stylesheet" href="./styles.css?v=6" />
   </head>
   <body>
     <div id="app">
@@ -80,8 +80,21 @@
       </header>
 
       <div id="theme-tray" class="theme-tray">
-        <p class="theme-hint">Tap a face · v5</p>
-        <div id="theme-row" class="theme-row" role="listbox" aria-label="Skins"></div>
+        <button
+          type="button"
+          id="theme-handle"
+          class="theme-handle"
+          aria-expanded="false"
+          aria-controls="theme-panel"
+        >
+          <span class="theme-handle-bar" aria-hidden="true"></span>
+          <span id="theme-handle-label">Skins</span>
+        </button>
+        <div id="theme-panel" class="theme-panel">
+          <div class="theme-panel-inner">
+            <div id="theme-row" class="theme-row" role="listbox" aria-label="Skins"></div>
+          </div>
+        </div>
       </div>
 
       <section class="stats" aria-label="Benchmarks">
@@ -181,6 +194,11 @@
             </div>
           </div>
           <ol id="history" class="history"></ol>
+          <button type="button" id="bit-card" class="bit-card" aria-label="Next line">
+            <span class="bit-kicker">Today’s line</span>
+            <span id="bit-line" class="bit-line"></span>
+            <span class="bit-hint">Tap for another</span>
+          </button>
         </section>
       </main>
     </div>
@@ -220,12 +238,12 @@
         </div>
         <input id="import-file" type="file" accept="application/json" hidden />
         <p class="fine-print">
-          Tap a face for a character skin. Scores stay on this device.
+          Pull or tap Skins for a character. Scores stay on this device.
         </p>
       </div>
     </div>
 
     <div id="toast" class="toast" hidden></div>
-    <script src="./app.js?v=5" defer></script>
+    <script src="./app.js?v=6" defer></script>
   </body>
 </html>
