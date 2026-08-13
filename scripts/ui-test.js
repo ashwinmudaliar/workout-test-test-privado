@@ -13,9 +13,15 @@ const puppeteer = require("puppeteer-core");
   const startLabel = await page.$eval("#timer-label", (el) => el.textContent.trim());
   if (startLabel !== "Tap to start") throw new Error(`expected Tap to start, got ${startLabel}`);
 
+  const bit0 = await page.$eval("#bit-line", (el) => el.textContent.trim());
+  if (!bit0) throw new Error("expected a quote under the timer");
+  if (!/deez nuts/i.test(bit0)) throw new Error(`opening line missing deez nuts: ${bit0}`);
+
   await page.click("#timer-btn");
   await page.waitForFunction(() => document.querySelector("#timer-label").textContent === "Tap to pause");
   await page.click("#round-btn");
+  const bit1 = await page.$eval("#bit-line", (el) => el.textContent.trim());
+  if (bit1 === bit0) throw new Error("adding a round should change the quote");
   await page.click("#round-btn");
   const rounds = await page.$eval("#rounds", (el) => el.textContent.trim());
   if (rounds !== "2") throw new Error(`expected 2 rounds, got ${rounds}`);
@@ -29,6 +35,8 @@ const puppeteer = require("puppeteer-core");
   await page.click("#undo-btn");
   const undone = await page.$eval("#rounds", (el) => el.textContent.trim());
   if (undone !== "2") throw new Error(`undo should drop to 2, got ${undone}`);
+  const bitAfterUndo = await page.$eval("#bit-line", (el) => el.textContent.trim());
+  if (bitAfterUndo === bit1) throw new Error("undoing a round should change the quote");
 
   await page.click("#timer-btn");
   await page.waitForFunction(() => document.querySelector("#timer-label").textContent === "Tap to go");
@@ -72,8 +80,8 @@ const puppeteer = require("puppeteer-core");
 
   await page.click('.tab[data-view="workout"]');
   const rickLine = await page.$eval("#bit-line", (el) => el.textContent.trim());
-  if (!/burp|nanites|dummy|Citadel/i.test(rickLine)) {
-    throw new Error(`expected a Rick line after skin change, got ${rickLine}`);
+  if (!/deez nuts/i.test(rickLine)) {
+    throw new Error(`expected a Rick deez-nuts line after skin change, got ${rickLine}`);
   }
   const kicker = await page.$eval("#bit-card .bit-kicker", (el) => el.textContent.trim());
   if (kicker !== "Rick") throw new Error(`expected Rick kicker, got ${kicker}`);
