@@ -1,0 +1,8 @@
+{
+  "name": "cindy",
+  "private": true,
+  "description": "Cindy — 20-minute AMRAP tracker you can add to your home screen.",
+  "scripts": {
+    "start": "python3 -m http.server 8080"
+  }
+}

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1"
+    />
+    <meta name="theme-color" content="#070708" />
+    <meta name="color-scheme" content="dark" />
+    <meta
+      name="description"
+      content="Track CrossFit Cindy every day: 5 pull-ups, 10 push-ups, 15 squats. 20-minute AMRAP with a home-screen timer."
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Cindy" />
+    <meta name="application-name" content="Cindy" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <title>Cindy</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="install-banner" class="install-banner" hidden>
+        <p id="install-copy"></p>
+        <div class="install-actions">
+          <button type="button" id="install-btn" class="text-btn" hidden>Install</button>
+          <button type="button" id="install-dismiss" class="text-btn muted">Not now</button>
+        </div>
+      </div>
+
+      <header class="top">
+        <div class="brand">
+          <svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
+            <g
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-width="2.4"
+            >
+              <line x1="32" y1="6" x2="32" y2="12" />
+              <line x1="32" y1="52" x2="32" y2="58" />
+              <line x1="6" y1="32" x2="12" y2="32" />
+              <line x1="52" y1="32" x2="58" y2="32" />
+              <line x1="15.1" y1="15.1" x2="19.3" y2="19.3" />
+              <line x1="44.7" y1="44.7" x2="48.9" y2="48.9" />
+              <line x1="15.1" y1="48.9" x2="19.3" y2="44.7" />
+              <line x1="44.7" y1="19.3" x2="48.9" y2="15.1" />
+            </g>
+            <text
+              x="32"
+              y="42"
+              text-anchor="middle"
+              fill="currentColor"
+              font-size="34"
+              font-weight="800"
+              font-family="Arial Black, Helvetica Neue, sans-serif"
+              font-style="italic"
+            >
+              C
+            </text>
+          </svg>
+          <div>
+            <h1>Cindy</h1>
+            <p>5 · 10 · 15 · 20-min AMRAP</p>
+          </div>
+        </div>
+        <button type="button" id="settings-btn" class="icon-btn" aria-label="Settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.61-.22l-2.39.96a7.07 7.07 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 13.9 2h-3.8a.5.5 0 0 0-.5.42l-.36 2.54c-.59.22-1.14.54-1.63.94l-2.39-.96a.5.5 0 0 0-.61.22L2.7 8.48a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94L2.82 14.16a.5.5 0 0 0-.12.64l1.92 3.32c.13.23.4.32.61.22l2.39-.96c.49.4 1.04.72 1.63.94l.36 2.54c.05.24.26.42.5.42h3.8c.24 0 .45-.18.5-.42l.36-2.54c.59-.22 1.14-.54 1.63-.94l2.39.96c.21.1.48 0 .61-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"
+            />
+          </svg>
+        </button>
+      </header>
+
+      <section class="stats" aria-label="Benchmarks">
+        <div class="stat">
+          <span class="stat-label">Today</span>
+          <strong id="stat-today">—</strong>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Best</span>
+          <strong id="stat-pb">—</strong>
+        </div>
+        <div class="stat tom">
+          <span class="stat-label">Tom</span>
+          <strong>27</strong>
+        </div>
+      </section>
+
+      <nav class="tabs" aria-label="Views">
+        <button type="button" class="tab is-active" data-view="workout">Workout</button>
+        <button type="button" class="tab" data-view="log">Log</button>
+      </nav>
+
+      <main>
+        <section id="view-workout" class="view is-active">
+          <div class="hero">
+            <div class="timer-wrap">
+              <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="ring-track" cx="60" cy="60" r="54" />
+                <circle id="ring-value" class="ring-value" cx="60" cy="60" r="54" />
+              </svg>
+              <div class="timer-readout">
+                <p id="timer-label" class="timer-label">Ready</p>
+                <p id="clock" class="clock" aria-live="polite">20:00</p>
+                <p class="cap">20:00 cap</p>
+              </div>
+            </div>
+            <div class="rounds-block">
+              <p class="rounds-label">Rounds</p>
+              <p id="rounds" class="rounds">0</p>
+            </div>
+          </div>
+
+          <ul class="movements" id="movements">
+            <li>
+              <button type="button" class="movement" data-i="0">
+                <span class="reps">5</span>
+                <span class="name">Pull-ups</span>
+                <span class="check" aria-hidden="true"></span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="movement" data-i="1">
+                <span class="reps">10</span>
+                <span class="name">Push-ups</span>
+                <span class="check" aria-hidden="true"></span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="movement" data-i="2">
+                <span class="reps">15</span>
+                <span class="name">Squats</span>
+                <span class="check" aria-hidden="true"></span>
+              </button>
+            </li>
+          </ul>
+
+          <div class="controls">
+            <div class="round-row">
+              <button type="button" id="undo-btn" class="btn ghost" aria-label="Undo round">
+                −
+              </button>
+              <button type="button" id="round-btn" class="btn lime">+ Round</button>
+            </div>
+            <div id="primary-row" class="primary-row">
+              <button type="button" id="primary-btn" class="btn primary">Start</button>
+            </div>
+            <div id="paused-row" class="primary-row" hidden>
+              <button type="button" id="reset-btn" class="btn ghost">Reset</button>
+              <button type="button" id="resume-btn" class="btn lime">Resume</button>
+            </div>
+            <div id="done-row" class="primary-row stacked" hidden>
+              <button type="button" id="save-btn" class="btn lime">Save today’s score</button>
+              <button type="button" id="discard-btn" class="btn ghost">Discard</button>
+            </div>
+            <button type="button" id="quick-log-btn" class="text-btn muted center">
+              Already finished? Log rounds
+            </button>
+          </div>
+        </section>
+
+        <section id="view-log" class="view">
+          <div class="log-hero">
+            <div>
+              <p class="stat-label">Streak</p>
+              <p id="streak" class="streak">0 days</p>
+            </div>
+            <p id="holland-note" class="holland-note">
+              Tom Holland’s record: 27 rounds. Chase it.
+            </p>
+          </div>
+          <div class="chart-card">
+            <div class="chart-head">
+              <span>Last 14 days</span>
+              <span class="muted">Tom’s 27</span>
+            </div>
+            <div class="chart-frame">
+              <div id="tom-line" class="tom-line"></div>
+              <div id="chart" class="chart"></div>
+            </div>
+          </div>
+          <ol id="history" class="history"></ol>
+        </section>
+      </main>
+    </div>
+
+    <div id="modal" class="modal" hidden>
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <h2 id="modal-title">Log rounds</h2>
+        <p id="modal-copy" class="muted">How many full rounds did you finish?</p>
+        <div class="stepper">
+          <button type="button" id="step-down" class="btn ghost">−</button>
+          <input id="step-value" type="number" min="0" max="99" inputmode="numeric" value="0" />
+          <button type="button" id="step-up" class="btn ghost">+</button>
+        </div>
+        <div class="sheet-actions">
+          <button type="button" id="modal-cancel" class="btn ghost">Cancel</button>
+          <button type="button" id="modal-save" class="btn lime">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="settings" class="modal" hidden>
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+        <h2 id="settings-title">Settings</h2>
+        <label class="toggle">
+          <span>Sound</span>
+          <input id="setting-sound" type="checkbox" checked />
+        </label>
+        <label class="toggle">
+          <span>Haptics</span>
+          <input id="setting-haptics" type="checkbox" checked />
+        </label>
+        <div class="sheet-actions stacked">
+          <button type="button" id="export-btn" class="btn ghost">Export log</button>
+          <button type="button" id="import-btn" class="btn ghost">Import log</button>
+          <button type="button" id="clear-btn" class="btn danger-ghost">Clear history</button>
+          <button type="button" id="settings-close" class="btn lime">Done</button>
+        </div>
+        <input id="import-file" type="file" accept="application/json" hidden />
+        <p class="fine-print">
+          Scores stay on this device. Add Cindy to your home screen for a one-tap gym timer.
+        </p>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" hidden></div>
+    <script src="./app.js" defer></script>
+  </body>
+</html>
