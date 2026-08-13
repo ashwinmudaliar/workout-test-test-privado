@@ -122,6 +122,36 @@ input:focus-visible {
   text-transform: uppercase;
 }
 
+.brand-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 0;
+  color: var(--muted);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.rx-icon {
+  width: 22px;
+  height: 22px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rx-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+
 .icon-btn {
   width: 44px;
   height: 44px;
