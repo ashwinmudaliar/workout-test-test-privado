@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Draw the Bofa skin: a cartoon pair of very hairy balls. No person."""
+"""Bofa skin: saggy two-lobe cartoon balls with a Time Cop mouth."""
 from __future__ import annotations
 
 import math
@@ -11,173 +11,138 @@ from PIL import Image, ImageDraw, ImageFilter
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "themes" / "bofa"
 SIZE = 640
-BG = (16, 12, 9)
-SKIN = (201, 148, 108)
-SKIN_LIT = (232, 188, 148)
-SKIN_DARK = (118, 72, 44)
-SEAM = (86, 50, 32)
-OUTLINE = (10, 7, 5)
-HAIR_COLORS = [
-    (12, 8, 5),
-    (28, 18, 11),
-    (46, 30, 18),
-    (22, 14, 9),
-    (8, 6, 4),
-    (58, 38, 22),
-]
+BG = (18, 14, 12)
+OUTLINE = (8, 5, 5)
+MID = (220, 110, 104)
+DARK = (156, 52, 54)
+CREASE = (112, 36, 40)
+MOUTH = (20, 8, 10)
+GUM = (118, 34, 38)
+TOOTH = (236, 214, 118)
+TOOTH_EDGE = (90, 64, 28)
+HAIR = (32, 16, 12)
+
+# Two round bags. Right hangs lower. Deep saddle so it cannot read as one fruit.
+LEFT = (228, 350, 168, 128)
+RIGHT = (418, 500, 162, 122)
 
 
-def ball(cx: float, cy: float, rx: float, ry: float) -> tuple[float, float, float, float]:
-    return cx, cy, rx, ry
+def d_ell(x: float, y: float, cx: float, cy: float, rx: float, ry: float) -> float:
+    return ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2
 
 
-LEFT = ball(248, 332, 168, 186)
-RIGHT = ball(412, 348, 160, 178)
+def inside(x: float, y: float) -> bool:
+    return d_ell(x, y, *LEFT) <= 1.0 or d_ell(x, y, *RIGHT) <= 1.0
 
 
-def inside_pair(x: float, y: float) -> bool:
-    for cx, cy, rx, ry in (LEFT, RIGHT):
-        dx = (x - cx) / rx
-        dy = (y - cy) / ry
-        if dx * dx + dy * dy <= 1:
-            return True
-    return False
-
-
-def nearest_ball(x: float, y: float):
-    best = None
-    best_d = 9e9
-    for b in (LEFT, RIGHT):
-        cx, cy, rx, ry = b
-        d = ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2
-        if d < best_d:
-            best_d = d
-            best = b
-    return best, best_d
-
-
-def shade_pair() -> Image.Image:
+def cel_body() -> Image.Image:
     img = Image.new("RGB", (SIZE, SIZE), BG)
     px = img.load()
-    light = (210, 160)
     for y in range(SIZE):
         for x in range(SIZE):
-            if not inside_pair(x, y):
+            dl = d_ell(x, y, *LEFT)
+            dr = d_ell(x, y, *RIGHT)
+            if dl > 1.0 and dr > 1.0:
                 continue
-            (cx, cy, rx, ry), d = nearest_ball(x, y)
-            nx = (x - cx) / rx
-            ny = (y - cy) / ry
-            lx = (light[0] - cx) / rx
-            ly = (light[1] - cy) / ry
-            ln = math.hypot(lx, ly) or 1
-            lx, ly = lx / ln, ly / ln
-            lambert = max(0.0, nx * lx + ny * ly)
-            edge = min(1.0, d ** 0.5)
-            t = 0.22 + 0.55 * lambert + 0.23 * (1 - edge)
-            # cleft between the two
-            mid = 1 - abs(x - 330) / 58
-            if 0.15 < mid and abs(y - 348) < 170:
-                t *= 0.62 + 0.38 * (1 - mid)
-            r = int(SKIN_DARK[0] + (SKIN_LIT[0] - SKIN_DARK[0]) * t)
-            g = int(SKIN_DARK[1] + (SKIN_LIT[1] - SKIN_DARK[1]) * t)
-            b = int(SKIN_DARK[2] + (SKIN_LIT[2] - SKIN_DARK[2]) * t)
-            px[x, y] = (r, g, b)
+            d = min(dl, dr)
+            cx, cy, rx, ry = LEFT if dl < dr else RIGHT
+            ly = (y - cy) / ry
+            underside = ly > 0.28
+            saddle = abs(x - 330) < 28 and 300 < y < 540
+            if d > 0.86 or underside or saddle:
+                px[x, y] = DARK
+            else:
+                px[x, y] = MID
     return img
 
 
-def outline_pair(img: Image.Image) -> None:
-    draw = ImageDraw.Draw(img)
+def outline(img: Image.Image) -> Image.Image:
     mask = Image.new("L", (SIZE, SIZE), 0)
     m = mask.load()
     for y in range(SIZE):
         for x in range(SIZE):
-            if inside_pair(x, y):
+            if inside(x, y):
                 m[x, y] = 255
-    ring = Image.new("L", (SIZE, SIZE), 0)
-    grow = mask.filter(ImageFilter.MaxFilter(9))
+    grow = mask.filter(ImageFilter.MaxFilter(13))
     shrink = mask.filter(ImageFilter.MinFilter(5))
-    rp = ring.load()
-    gp = grow.load()
-    sp = shrink.load()
-    ip = img.load()
+    gp, sp, ip = grow.load(), shrink.load(), img.load()
     for y in range(SIZE):
         for x in range(SIZE):
             if gp[x, y] and not sp[x, y]:
                 ip[x, y] = OUTLINE
-                rp[x, y] = 255
-    # inner seam
-    draw.line((328, 220, 318, 455), fill=SEAM, width=8)
-    draw.line((332, 230, 342, 445), fill=(70, 40, 26), width=3)
+    return img
 
 
-def hair_from(x: float, y: float, rng: random.Random):
-    _, d = nearest_ball(x, y)
-    (cx, cy, rx, ry) = nearest_ball(x, y)[0]
-    nx = (x - cx) / rx
-    ny = (y - cy) / ry
-    ang = math.atan2(ny, nx)
-    # bias down and out
-    ang += rng.uniform(-0.55, 0.55) + 0.35 * math.sin(ang + 1.2)
-    length = rng.uniform(22, 72)
-    if ny < -0.15:
-        length *= 0.8
-    else:
-        length *= 1.15
-    if d < 0.55:
-        length *= 0.5
-    return ang, length
+def details(draw: ImageDraw.ImageDraw, rng: random.Random) -> None:
+    # cleft
+    draw.line([(318, 250), (330, 330), (312, 410), (338, 500), (322, 560)], fill=CREASE, width=9, joint="curve")
+    draw.arc((90, 280, 370, 540), 50, 150, fill=CREASE, width=6)
+    draw.arc((280, 400, 590, 640), 40, 160, fill=CREASE, width=6)
+    draw.arc((120, 210, 350, 400), 200, 330, fill=CREASE, width=5)
+    draw.arc((320, 340, 560, 530), 200, 340, fill=CREASE, width=5)
 
+    # Time Cop mouth across the sag
+    box = (248, 470, 430, 600)
+    draw.ellipse(box, fill=MOUTH, outline=OUTLINE, width=9)
+    draw.arc((256, 476, 422, 530), 200, 340, fill=GUM, width=14)
+    draw.arc((262, 536, 416, 594), 20, 160, fill=GUM, width=12)
+    top = [
+        (262, 492, 288, 532, 3),
+        (290, 486, 316, 538, -4),
+        (318, 482, 344, 540, 5),
+        (346, 486, 372, 536, -3),
+        (374, 492, 398, 528, 4),
+    ]
+    bot = [
+        (268, 586, 292, 550, -3),
+        (294, 590, 320, 546, 5),
+        (322, 592, 348, 544, -4),
+        (350, 588, 376, 548, 3),
+        (378, 582, 402, 554, -3),
+    ]
+    for x0, y0, x1, y1, lean in top:
+        draw.polygon(
+            [(x0 + lean, y0), (x1 + lean, y0), (x1, y1), (x0, y1 - 6)],
+            fill=TOOTH,
+            outline=TOOTH_EDGE,
+        )
+    for x0, y0, x1, y1, lean in bot:
+        draw.polygon(
+            [(x0, y1), (x1, y1), (x1 + lean, y0), (x0 + lean, y0)],
+            fill=TOOTH,
+            outline=TOOTH_EDGE,
+        )
 
-def draw_hair(img: Image.Image, rng: random.Random) -> None:
-    draw = ImageDraw.Draw(img)
-    points = []
-    for _ in range(6200):
-        x = rng.uniform(70, 570)
-        y = rng.uniform(110, 580)
-        if not inside_pair(x, y):
-            # allow a little outside so roots sit on the rim
-            if not inside_pair(x, y - 6) and not inside_pair(x + 4, y + 4):
-                continue
-        points.append((x, y))
-    # extra rim follicles
-    for _ in range(2400):
-        t = rng.random() * math.tau
-        b = LEFT if rng.random() < 0.52 else RIGHT
-        cx, cy, rx, ry = b
-        x = cx + math.cos(t) * rx * rng.uniform(0.92, 1.02)
-        y = cy + math.sin(t) * ry * rng.uniform(0.92, 1.02)
-        points.append((x, y))
-
-    for x, y in points:
-        ang, length = hair_from(x, y, rng)
-        color = rng.choice(HAIR_COLORS)
-        width = rng.choice((1, 1, 1, 2, 2, 3))
+    # curly pubes from the top of each bag
+    roots = [
+        (180, 230), (210, 214), (248, 208), (280, 218),
+        (360, 300), (400, 340), (440, 360), (470, 390),
+        (160, 260), (490, 420),
+    ]
+    for x, y in roots:
+        if not inside(x, y):
+            continue
+        ang = rng.uniform(-2.7, -0.4)
         pts = [(x, y)]
         px, py = x, y
-        a = ang
-        steps = rng.randint(5, 9)
-        for i in range(steps):
-            a += rng.uniform(-0.7, 0.7)
-            # curls droop
-            a = 0.82 * a + 0.18 * (math.pi / 2)
-            step = length / steps
-            px += math.cos(a) * step
-            py += math.sin(a) * step
+        for _ in range(6):
+            ang += rng.uniform(-0.7, 0.7)
+            px += math.cos(ang) * 5.5
+            py += math.sin(ang) * 5.5
             pts.append((px, py))
-        draw.line(pts, fill=color, width=width, joint="curve")
+        draw.line(pts, fill=HAIR, width=5, joint="curve")
 
 
 def render() -> None:
-    rng = random.Random(7)
+    rng = random.Random(4)
     OUT.mkdir(parents=True, exist_ok=True)
-    img = shade_pair()
-    outline_pair(img)
-    draw_hair(img, rng)
-    img = img.filter(ImageFilter.SMOOTH)
+    img = cel_body()
+    img = outline(img)
+    details(ImageDraw.Draw(img), rng)
     bust = img.resize((640, 640), Image.Resampling.LANCZOS)
-    bust.save(OUT / "bust.jpg", "JPEG", quality=90, optimize=True)
-    mark = img.crop((90, 120, 550, 580)).resize((256, 256), Image.Resampling.LANCZOS)
-    mark.save(OUT / "mark.jpg", "JPEG", quality=90, optimize=True)
+    bust.save(OUT / "bust.jpg", "JPEG", quality=92, optimize=True)
+    mark = img.crop((20, 150, 620, 640)).resize((256, 256), Image.Resampling.LANCZOS)
+    mark.save(OUT / "mark.jpg", "JPEG", quality=92, optimize=True)
     print("wrote", OUT / "bust.jpg", OUT / "mark.jpg")
 
 
