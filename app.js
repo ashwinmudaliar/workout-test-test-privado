@@ -742,7 +742,7 @@
       els.installCopy.textContent = "On iPhone: Share → Add to Home Screen.";
       els.installBtn.hidden = true;
     } else if (deferredPrompt) {
-      els.installCopy.textContent = "Install AMRAP for a home-screen timer.";
+      els.installCopy.textContent = "Install BOFA Protocol for a home-screen timer.";
       els.installBtn.hidden = false;
     } else {
       els.installCopy.textContent = "Add this page to your home screen for gym use.";
@@ -996,7 +996,7 @@
 
   if ("serviceWorker" in navigator) {
     let hadController = Boolean(navigator.serviceWorker.controller);
-    navigator.serviceWorker.register("./sw.js?v=10", { updateViaCache: "none" });
+    navigator.serviceWorker.register("./sw.js?v=11", { updateViaCache: "none" });
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (!hadController) {
         hadController = true;

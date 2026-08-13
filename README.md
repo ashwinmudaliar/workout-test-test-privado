@@ -1,4 +1,4 @@
-# AMRAP
+# BOFA Protocol
 
 20-minute AMRAP: 5 pull-ups, 10 push-ups, 15 squats.
 

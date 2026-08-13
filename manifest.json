@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "AMRAP — 20 minutes",
-  "short_name": "AMRAP",
+  "name": "BOFA Protocol",
+  "short_name": "BOFA",
   "description": "Track a 20-minute AMRAP daily: 5 pull-ups, 10 push-ups, 15 squats.",
   "start_url": "./index.html",
   "scope": "./",

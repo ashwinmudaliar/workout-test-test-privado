@@ -31,6 +31,7 @@ for (const needle of [
   "Squats",
   "theme-handle",
   "bit-card",
+  "BOFA Protocol",
 ]) {
   if (!html.includes(needle)) throw new Error(`index.html missing ${needle}`);
 }
