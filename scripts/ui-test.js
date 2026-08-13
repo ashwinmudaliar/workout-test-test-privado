@@ -52,7 +52,7 @@ const puppeteer = require("puppeteer-core");
 
   const line = await page.$eval(".view.is-active .bit-line", (el) => el.textContent.trim());
   if (!line) throw new Error("expected a rotating line under the log");
-  if (!/deez nuts|Twenty minutes|clock/i.test(line)) {
+  if (!/deez nuts|sunken place|handshake/i.test(line)) {
     throw new Error(`unexpected opening line: ${line}`);
   }
   await page.$eval(".view.is-active .bit-card", (el) => el.click());
@@ -67,6 +67,14 @@ const puppeteer = require("puppeteer-core");
   if (theme !== "rick") throw new Error(`expected rick theme, got ${theme}`);
   const trayClosed = await page.$eval("#theme-tray", (el) => !el.classList.contains("is-open"));
   if (!trayClosed) throw new Error("picking a skin should close the tray");
+
+  await page.click('.tab[data-view="workout"]');
+  const rickLine = await page.$eval("#bit-line", (el) => el.textContent.trim());
+  if (!/burp|nanites|dummy|Citadel/i.test(rickLine)) {
+    throw new Error(`expected a Rick line after skin change, got ${rickLine}`);
+  }
+  const kicker = await page.$eval("#bit-card .bit-kicker", (el) => el.textContent.trim());
+  if (kicker !== "Rick") throw new Error(`expected Rick kicker, got ${kicker}`);
 
   await page.screenshot({ path: "/tmp/amrap-log.png" });
   console.log("ui tests ok");

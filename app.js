@@ -111,28 +111,83 @@
     },
   ];
 
-  const LINES = [
-    "Chris, sit. The teacup is for your hands. Deez nuts are for the part where you try to leave.",
-    "The sunken place isn’t down. It’s the pause between “I’ll start tomorrow” and deez nuts.",
-    "They didn’t steal your body. They leased it. Clause nine is deez nuts.",
-    "There are two of you. One logged the rounds. One is still in the walls, whispering deez nuts.",
-    "Nope is about not looking. You looked. That’s on you. The feed is deez nuts.",
-    "The hypnosis isn’t the TV. It’s the voice that says you already did enough. Repeat after me: deez nuts.",
-    "A good neighbor waves. A great neighbor keeps a red light in the basement for deez nuts.",
-    "You walked in asking for rest. The family smiled. They heard deez nuts.",
-    "Your tethered already finished the 20. He’s under the bed. He brought deez nuts.",
-    "The deer on the hood was warning one. Warning two arrived in a cotton sack labeled deez nuts.",
-    "Motivation is the bait. The clock is the hook. The movie they actually shot is deez nuts.",
-    "Do not look at the sky. That’s how the spectacle eats. Look at deez nuts.",
-    "They clapped at the credits. They thought you got out. You made deez nuts.",
-    "If you’re reading this instead of moving, you’ve been chosen. The ceremony is deez nuts.",
-    "The Armitage dinner was never about the wine pairing. It was about deez nuts.",
-    "A quiet street. A perfect streak. A hole in the floor, breathing deez nuts.",
-    "You wanted a sign. The universe sent a teacup, a deer, an audience, and deez nuts.",
-    "Twenty minutes. Everything after that is optional.",
-    "The clock does not care how you feel. That’s the gift.",
-    "Nobody will clap. Do it anyway.",
-  ];
+  const LINES = {
+    amrap: [
+      "You opened the app. That’s the handshake. Deez nuts are the tour of the house.",
+      "Sit. Smile. Don’t spill the tea. When the lights go red, deez nuts start collecting.",
+      "They didn’t hypnotize you with a teacup. They hypnotized you with later. The trigger word is deez nuts.",
+      "Look at the camera. Don’t look at the sky. The third thing, the one that feeds, is deez nuts.",
+      "You thought this was your workout. This is their screening. Test audience loved deez nuts.",
+      "The sunken place has a leaderboard. Guess what’s in first.",
+    ],
+    rick: [
+      "*burp* Motivation is shame in a nicer font. The honest font just says deez nuts.",
+      "I built a universe where your streak mattered. Then I remembered deez nuts and deleted it.",
+      "You’re negotiating with a timer like it has a dad. It doesn’t. It’s deez nuts wearing a progress ring.",
+      "I could replace your muscles with nanites. I won’t. Watching you discover deez nuts is the experiment.",
+      "Stop looking at me like this is a lesson. The lesson is deez nuts. Class dismissed, dummy.",
+      "The Citadel took a vote. Unanimous. You’re the control group for deez nuts.",
+    ],
+    morty: [
+      "Aw geez, I-I thought this was pull-ups. That’s not pull-ups. That’s deez nuts. That’s 100% deez nuts.",
+      "Nobody exists on purpose. Everybody’s gonna die. Come watch TV. It’s deez nuts on a loop.",
+      "I don’t wanna be the bit. I’m always the bit. The bit is deez nuts. It won’t let me out.",
+      "This is worse than the dog planet. The dogs were honest. This is deez nuts wearing a streak.",
+      "Can we not make the timer sentient? Last time it learned my name and it was deez nuts.",
+      "I’m not doing a catchphrase. I’m not—oh god it’s deez nuts. It’s deez nuts again.",
+    ],
+    beth: [
+      "I’m a heart surgeon. For horses. Which is harder. I still can’t cut deez nuts out of this house.",
+      "Jerry would skip. That’s why he’s Jerry. I’m not Jerry. I’m deez nuts with a Cabernet and a scalpel.",
+      "Dad’s not coming. Dad’s in the garage making universes. We’re here. With deez nuts. Drink.",
+      "I cloned myself so one of me could rest. Both of us got deez nuts. That’s the family business.",
+      "Don’t talk to me about balance. Balance is a bedtime story you tell so you can skip deez nuts.",
+      "Nobody else in this house will do the hard thing. The hard thing is deez nuts. Pass the wine.",
+    ],
+    "space-beth": [
+      "I killed a version of you for less than a skipped squat. Deez nuts. Next target.",
+      "Clone or not, the body still pays. Invoice is deez nuts. Due now.",
+      "Earth Beth drinks. I do the 20. Guess which one still has deez nuts in the cargo hold.",
+      "I don’t need a pep talk. I need you to stop negotiating with gravity. Gravity is deez nuts.",
+      "The mission was simple. You turned it into a feeling. Feelings get people killed. Also deez nuts.",
+      "I’m not your better self. I’m the one who showed up. Deez nuts are the after-action report.",
+    ],
+    "scary-terry": [
+      "A-A-A-A-A! You thought that was a rest day, bitch? That was deez nuts in a trench coat.",
+      "Welcome to the dream. The clock works here. Deez nuts work better, bitch.",
+      "I live in the walls of people who skip squats. Rent is deez nuts. Pay up, bitch.",
+      "Don’t scream. That’s my job. Your job is deez nuts. A-A-A!",
+      "You can wake up. You won’t like the kitchen. It’s deez nuts, bitch. It’s always deez nuts.",
+      "Scary Terry’s not the monster. The monster is you snoozing deez nuts, bitch.",
+    ],
+    birdperson: [
+      "In my culture we do not say good job. We say the name of the fallen. Today the fallen are deez nuts.",
+      "I have fought in many wars. This is not a war. This is deez nuts, which is worse, because it returns tomorrow.",
+      "Tammy taught me love can be a drone strike. This app taught me deez nuts. I prefer the drones.",
+      "When the music is sad, you lift. When the music stops, deez nuts remain. This is the way.",
+      "I am not angry. I am disappointed in a way that has feathers. Also deez nuts.",
+      "Friendship is showing up. Showing up is deez nuts. I have already begun.",
+    ],
+    "evil-morty": [
+      "You keep thinking this is a sitcom. It’s a purge with a timer. The citadel banner says deez nuts.",
+      "I already left. You’re still here doing reps for a man who will never say sorry. That’s deez nuts. That’s the show.",
+      "Every genius is a scam. Every streak is a leash. Cut it. What’s left is deez nuts, and it does not need you.",
+      "I wore the eyepatch so I wouldn’t have to watch the bit. The bit found me. Deez nuts always do.",
+      "You logged rounds in a simulation I burned. The exit interview is deez nuts.",
+      "Don’t thank the app. It was never on your side. It was deez nuts in a lime-green skin.",
+    ],
+  };
+
+  const LINE_KICKERS = {
+    amrap: "Peele dept.",
+    rick: "Rick",
+    morty: "Morty",
+    beth: "Beth",
+    "space-beth": "Space Beth",
+    "scary-terry": "Scary Terry",
+    birdperson: "Birdperson",
+    "evil-morty": "Evil Morty",
+  };
 
   const els = {
     installBanner: document.getElementById("install-banner"),
@@ -191,6 +246,7 @@
     themeRow: document.getElementById("theme-row"),
     bitCards: document.querySelectorAll(".bit-card"),
     bitLines: document.querySelectorAll(".bit-line"),
+    bitKickers: document.querySelectorAll(".bit-kicker"),
     brandSub: document.getElementById("brand-sub"),
     themeColorMeta: document.querySelector('meta[name="theme-color"]'),
   };
@@ -552,21 +608,30 @@
     els.themeHandleLabel.textContent = trayOpen ? "Tap a face" : "Skins";
   }
 
+  function currentTheme() {
+    return THEMES.find((theme) => theme.id === state.settings.theme) || THEMES[0];
+  }
+
   function dayLineIndex() {
     const now = new Date();
     const start = new Date(now.getFullYear(), 0, 0);
     return Math.floor((now - start) / 86400000);
   }
 
+  function themeLines() {
+    return LINES[currentTheme().id] || LINES.amrap;
+  }
+
   function renderBit() {
-    const text = LINES[(dayLineIndex() + bitShift) % LINES.length];
+    const pool = themeLines();
+    const text = pool[(dayLineIndex() + bitShift) % pool.length];
+    const kicker = LINE_KICKERS[currentTheme().id] || LINE_KICKERS.amrap;
     els.bitLines.forEach((el) => {
       el.textContent = text;
     });
-  }
-
-  function currentTheme() {
-    return THEMES.find((theme) => theme.id === state.settings.theme) || THEMES[0];
+    els.bitKickers.forEach((el) => {
+      el.textContent = kicker;
+    });
   }
 
   function renderThemeTray() {
@@ -603,6 +668,8 @@
     }
     renderThemeTray();
     renderTimer();
+    bitShift = 0;
+    renderBit();
     save();
     if (announce) {
       setTrayOpen(false);
@@ -994,7 +1061,7 @@
 
   if ("serviceWorker" in navigator) {
     let hadController = Boolean(navigator.serviceWorker.controller);
-    navigator.serviceWorker.register("./sw.js?v=7", { updateViaCache: "none" });
+    navigator.serviceWorker.register("./sw.js?v=8", { updateViaCache: "none" });
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (!hadController) {
         hadController = true;
