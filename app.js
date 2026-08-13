@@ -4,6 +4,7 @@
   const INSTALL_KEY = "amrap-install-dismissed";
   const LEGACY_INSTALL_KEY = "cindy-install-dismissed";
   const DEFAULT_THEME = "rick";
+  const DEFAULT_PACK = "rnm";
   const THEME_BASELINE = 1;
   const WORKOUT_MS = 20 * 60 * 1000;
   const RING = 2 * Math.PI * 54;
@@ -115,6 +116,90 @@
     },
   ];
 
+  const PACKS = [
+    { id: "rnm", name: "Rick and Morty", defaultId: "rick" },
+    { id: "wick", name: "John Wick", defaultId: "john" },
+  ];
+
+  THEMES.forEach((theme) => {
+    if (!theme.pack) theme.pack = "rnm";
+  });
+
+  THEMES.push(
+    {
+      id: "john",
+      name: "John",
+      pack: "wick",
+      bust: "themes/wick/john/bust.jpg",
+      mark: "themes/wick/john/mark.jpg",
+      bg: "#070707",
+      labels: { idle: "Yeah", running: "Don't stop", paused: "Get up", finished: "Done" },
+    },
+    {
+      id: "winston",
+      name: "Winston",
+      pack: "wick",
+      bust: "themes/wick/winston/bust.jpg",
+      mark: "themes/wick/winston/mark.jpg",
+      bg: "#070707",
+      labels: { idle: "Rules", running: "Continue", paused: "Hold", finished: "Closed" },
+    },
+    {
+      id: "charon",
+      name: "Charon",
+      pack: "wick",
+      bust: "themes/wick/charon/bust.jpg",
+      mark: "themes/wick/charon/mark.jpg",
+      bg: "#070707",
+      labels: { idle: "Ready", running: "Service", paused: "A moment", finished: "Complete" },
+    },
+    {
+      id: "bowery-king",
+      name: "Bowery King",
+      pack: "wick",
+      bust: "themes/wick/bowery-king/bust.jpg",
+      mark: "themes/wick/bowery-king/mark.jpg",
+      bg: "#070707",
+      labels: { idle: "Preach", running: "Don't stop", paused: "Rise", finished: "Amen" },
+    },
+    {
+      id: "caine",
+      name: "Caine",
+      pack: "wick",
+      bust: "themes/wick/caine/bust.jpg",
+      mark: "themes/wick/caine/mark.jpg",
+      bg: "#070707",
+      labels: { idle: "Easy", running: "Continue", paused: "Wait", finished: "Done" },
+    },
+    {
+      id: "adjudicator",
+      name: "Adjudicator",
+      pack: "wick",
+      bust: "themes/wick/adjudicator/bust.jpg",
+      mark: "themes/wick/adjudicator/mark.jpg",
+      bg: "#070707",
+      labels: { idle: "Comply", running: "Continue", paused: "Hold", finished: "Closed" },
+    },
+    {
+      id: "sophia",
+      name: "Sophia",
+      pack: "wick",
+      bust: "themes/wick/sophia/bust.jpg",
+      mark: "themes/wick/sophia/mark.jpg",
+      bg: "#070707",
+      labels: { idle: "Move", running: "Hold it", paused: "Stay", finished: "Enough" },
+    },
+    {
+      id: "koji",
+      name: "Koji",
+      pack: "wick",
+      bust: "themes/wick/koji/bust.jpg",
+      mark: "themes/wick/koji/mark.jpg",
+      bg: "#070707",
+      labels: { idle: "Begin", running: "Endure", paused: "Rest", finished: "Finished" },
+    }
+  );
+
   const LINES = window.AMRAP_JOKES;
   const LINE_KICKERS = window.AMRAP_JOKE_KICKERS;
 
@@ -172,6 +257,7 @@
     themeHandle: document.getElementById("theme-handle"),
     themeHandleLabel: document.getElementById("theme-handle-label"),
     themeRow: document.getElementById("theme-row"),
+    packSelect: document.getElementById("pack-select"),
     bitCards: document.querySelectorAll(".bit-card"),
     bitLines: document.querySelectorAll(".bit-line"),
     bitKickers: document.querySelectorAll(".bit-kicker"),
@@ -233,7 +319,22 @@
   }
 
   function defaultSettings() {
-    return { sound: true, haptics: true, theme: DEFAULT_THEME, themeBaseline: THEME_BASELINE };
+    return {
+      sound: true,
+      haptics: true,
+      theme: DEFAULT_THEME,
+      themeBaseline: THEME_BASELINE,
+      pack: DEFAULT_PACK,
+      packTheme: { rnm: "rick", wick: "john" },
+    };
+  }
+
+  function packById(id) {
+    return PACKS.find((pack) => pack.id === id) || PACKS[0];
+  }
+
+  function themeInPack(id, packId) {
+    return THEMES.find((theme) => theme.id === id && theme.pack === packId);
   }
 
   function normalizeSettings(settings) {
@@ -244,7 +345,15 @@
       next.themeBaseline = THEME_BASELINE;
     }
     if (next.theme === "amrap") next.theme = "bofa";
-    if (!THEMES.some((theme) => theme.id === next.theme)) next.theme = DEFAULT_THEME;
+    const known = THEMES.find((theme) => theme.id === next.theme);
+    if (!known) next.theme = DEFAULT_THEME;
+    const theme = THEMES.find((item) => item.id === next.theme) || THEMES[0];
+    next.pack = theme.pack || DEFAULT_PACK;
+    next.packTheme = { rnm: "rick", wick: "john", ...(prev.packTheme || {}) };
+    PACKS.forEach((pack) => {
+      if (!themeInPack(next.packTheme[pack.id], pack.id)) next.packTheme[pack.id] = pack.defaultId;
+    });
+    next.packTheme[next.pack] = next.theme;
     return next;
   }
 
@@ -557,16 +666,26 @@
     els.themeHandleLabel.textContent = trayOpen ? "Tap a face" : "Skins";
   }
 
-  function themeById(id) {
+  function themeById(id, packId) {
+    const pack = packId || state.settings?.pack;
+    const inPack = pack ? themeInPack(id, pack) : null;
+    if (inPack) return inPack;
+    const any = THEMES.find((theme) => theme.id === id);
+    if (any) return any;
+    const fallbackPack = packById(pack || DEFAULT_PACK);
     return (
-      THEMES.find((theme) => theme.id === id) ||
+      themeInPack(fallbackPack.defaultId, fallbackPack.id) ||
       THEMES.find((theme) => theme.id === DEFAULT_THEME) ||
       THEMES[0]
     );
   }
 
   function currentTheme() {
-    return themeById(state.settings.theme);
+    return themeById(state.settings.theme, state.settings.pack);
+  }
+
+  function currentPack() {
+    return packById(state.settings.pack);
   }
 
   function dayLineIndex() {
@@ -596,23 +715,44 @@
     });
   }
 
+  function renderPackSelect() {
+    if (!els.packSelect) return;
+    const active = currentPack().id;
+    els.packSelect.innerHTML = PACKS.map(
+      (pack) =>
+        `<option value="${pack.id}"${pack.id === active ? " selected" : ""}>${pack.name}</option>`
+    ).join("");
+  }
+
   function renderThemeTray() {
     const active = currentTheme().id;
-    els.themeRow.innerHTML = THEMES.map((theme) => {
-      const portrait = theme.mark
-        ? `<img src="${theme.mark}" alt="">`
-        : `<span class="theme-chip-fallback">B</span>`;
-      return `<button type="button" class="theme-chip${theme.id === active ? " is-active" : ""}" data-theme-id="${theme.id}" role="option" aria-selected="${theme.id === active}">
+    const packId = currentPack().id;
+    const faces = THEMES.filter((theme) => theme.pack === packId);
+    els.themeRow.innerHTML = faces
+      .map((theme) => {
+        const portrait = theme.mark
+          ? `<img src="${theme.mark}" alt="">`
+          : `<span class="theme-chip-fallback">B</span>`;
+        return `<button type="button" class="theme-chip${theme.id === active ? " is-active" : ""}" data-theme-id="${theme.id}" role="option" aria-selected="${theme.id === active}">
         ${portrait}
         <span>${theme.name}</span>
       </button>`;
-    }).join("");
+      })
+      .join("");
   }
 
-  function applyTheme(id, announce = false) {
+  function applyTheme(id, opts = {}) {
+    const announce = typeof opts === "boolean" ? opts : Boolean(opts.announce);
+    const closeTray = typeof opts === "boolean" ? announce : (opts.closeTray ?? announce);
     const theme = themeById(id);
     state.settings.theme = theme.id;
+    state.settings.pack = theme.pack || DEFAULT_PACK;
+    state.settings.packTheme = {
+      ...state.settings.packTheme,
+      [state.settings.pack]: theme.id,
+    };
     document.documentElement.dataset.theme = theme.id;
+    document.documentElement.dataset.pack = state.settings.pack;
     if (els.themeColorMeta) els.themeColorMeta.content = theme.bg;
     if (theme.mark) {
       els.themeMark.src = theme.mark;
@@ -626,13 +766,14 @@
     } else {
       els.themeBust.hidden = true;
     }
+    renderPackSelect();
     renderThemeTray();
     renderTimer();
     bitShift = 0;
     renderBit();
     save();
+    if (closeTray) setTrayOpen(false);
     if (announce) {
-      setTrayOpen(false);
       toast(
         theme.id === "scary-terry"
           ? "Scary Terry, bitch"
@@ -642,6 +783,13 @@
       );
       buzz(16);
     }
+  }
+
+  function applyPack(packId) {
+    const pack = packById(packId);
+    const last = state.settings.packTheme?.[pack.id] || pack.defaultId;
+    applyTheme(last, { announce: false, closeTray: false });
+    toast(pack.name);
   }
 
   function toggleTimer() {
@@ -799,7 +947,11 @@
   els.themeRow.addEventListener("click", (event) => {
     const chip = event.target.closest("[data-theme-id]");
     if (!chip) return;
-    applyTheme(chip.dataset.themeId, true);
+    applyTheme(chip.dataset.themeId, { announce: true, closeTray: true });
+  });
+
+  els.packSelect.addEventListener("change", () => {
+    applyPack(els.packSelect.value);
   });
 
   els.themeHandle.addEventListener("pointerdown", (event) => {
@@ -1026,7 +1178,7 @@
 
   if ("serviceWorker" in navigator) {
     let hadController = Boolean(navigator.serviceWorker.controller);
-    navigator.serviceWorker.register("./sw.js?v=25", { updateViaCache: "none" });
+    navigator.serviceWorker.register("./sw.js?v=26", { updateViaCache: "none" });
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (!hadController) {
         hadController = true;

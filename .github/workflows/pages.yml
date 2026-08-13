@@ -25,7 +25,7 @@ jobs:
       - name: Package site
         run: |
           mkdir _site
-          cp index.html styles.css app.js jokes.js sw.js manifest.json .nojekyll README.md _site/
+          cp index.html styles.css app.js jokes.js jokes-wick.js sw.js manifest.json .nojekyll README.md _site/
           cp -r icons _site/icons
           cp -r themes _site/themes
       - uses: actions/upload-pages-artifact@v3

@@ -794,7 +794,6 @@ body,
 
 .theme-tray {
   margin: 0;
-  touch-action: none;
 }
 
 .theme-handle {
@@ -840,6 +839,39 @@ body,
 .theme-panel-inner {
   overflow: hidden;
   min-height: 0;
+}
+
+.pack-select-row {
+  display: grid;
+  gap: 6px;
+  padding: 2px 0 10px;
+}
+
+.pack-select-row > span {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.pack-select-row select,
+#pack-select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  background-color: var(--bg-elev);
+  color: var(--text);
+  border-radius: 14px;
+  padding: 10px 40px 10px 12px;
+  font-weight: 600;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--accent) 50%),
+    linear-gradient(135deg, var(--accent) 50%, transparent 50%);
+  background-position: calc(100% - 20px) calc(50% - 3px), calc(100% - 14px) calc(50% - 3px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  touch-action: manipulation;
 }
 
 .theme-row {
@@ -985,4 +1017,16 @@ body,
   --text: #f4f1e4;
   --muted: #8e8a78;
   --danger: #c9a227;
+}
+
+[data-pack="wick"] {
+  --bg: #070707;
+  --bg-elev: #141210;
+  --bg-elev-2: #1c1814;
+  --line: #3a3220;
+  --accent: #d4a84b;
+  --accent-ink: #140f00;
+  --text: #f4ead4;
+  --muted: #9a8a68;
+  --danger: #c44a32;
 }

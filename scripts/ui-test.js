@@ -155,6 +155,52 @@ const puppeteer = require("puppeteer-core");
   const markHidden = await page.$eval("#theme-mark", (el) => el.hidden);
   if (markHidden) throw new Error("character mark should show for Rick");
 
+  await page.click("#theme-handle");
+  await page.waitForFunction(() => document.querySelector("#theme-tray").classList.contains("is-open"));
+  await page.waitForSelector("#pack-select");
+  await page.select("#pack-select", "wick");
+  await page.waitForFunction(() => document.documentElement.dataset.pack === "wick");
+  const trayOpenAfterPack = await page.$eval("#theme-tray", (el) => el.classList.contains("is-open"));
+  if (!trayOpenAfterPack) throw new Error("switching packs should keep the skins tray open");
+  const wickTheme = await page.evaluate(() => document.documentElement.dataset.theme);
+  if (wickTheme !== "john") throw new Error(`first Wick visit should be John, got ${wickTheme}`);
+  const johnLabel = await page.$eval("#timer-label", (el) => el.textContent.trim());
+  if (johnLabel !== "Get up" && johnLabel !== "Yeah") {
+    throw new Error(`expected a John timer label, got ${johnLabel}`);
+  }
+  await page.click('.tab[data-view="workout"]');
+  const johnKicker = await page.$eval("#bit-card .bit-kicker", (el) => el.textContent.trim());
+  if (johnKicker !== "John") throw new Error(`expected John kicker, got ${johnKicker}`);
+  const johnLine = await page.$eval("#bit-line", (el) => el.textContent.trim());
+  if (!/deez nuts/i.test(johnLine)) throw new Error(`expected a Wick deez-nuts line, got ${johnLine}`);
+  if (await page.$('[data-theme-id="morty"]')) throw new Error("R&M faces should hide in the Wick pack");
+  await page.waitForSelector('[data-theme-id="winston"]');
+  await page.$eval('[data-theme-id="winston"]', (el) => el.click());
+  const winstonTheme = await page.evaluate(() => document.documentElement.dataset.theme);
+  if (winstonTheme !== "winston") throw new Error(`expected winston, got ${winstonTheme}`);
+  const trayClosedAfterWinston = await page.$eval("#theme-tray", (el) => !el.classList.contains("is-open"));
+  if (!trayClosedAfterWinston) throw new Error("picking a Wick face should close the tray");
+  const winstonKicker = await page.$eval("#bit-card .bit-kicker", (el) => el.textContent.trim());
+  if (winstonKicker !== "Winston") throw new Error(`expected Winston kicker, got ${winstonKicker}`);
+
+  await page.click("#theme-handle");
+  await page.waitForFunction(() => document.querySelector("#theme-tray").classList.contains("is-open"));
+  await page.select("#pack-select", "rnm");
+  await page.waitForFunction(() => document.documentElement.dataset.pack === "rnm");
+  const restored = await page.evaluate(() => document.documentElement.dataset.theme);
+  if (restored !== "rick") throw new Error(`switching back should restore last R&M face, got ${restored}`);
+  const trayOpenAfterReturn = await page.$eval("#theme-tray", (el) => el.classList.contains("is-open"));
+  if (!trayOpenAfterReturn) throw new Error("switching back to R&M should keep the tray open");
+  await page.waitForSelector('[data-theme-id="morty"]');
+  if (await page.$('[data-theme-id="winston"]')) throw new Error("Wick faces should hide in the R&M pack");
+
+  const storedPacks = await page.evaluate(() => JSON.parse(localStorage.getItem("amrap-tracker-v1")));
+  if (storedPacks.settings.pack !== "rnm") throw new Error("saved pack should be rnm after switching back");
+  if (storedPacks.settings.packTheme.wick !== "winston") {
+    throw new Error(`should remember Winston in Wick, got ${storedPacks.settings.packTheme.wick}`);
+  }
+  if (storedPacks.settings.theme !== "rick") throw new Error("active face after return should be rick");
+
   console.log("ui tests ok");
   await browser.close();
 })().catch(async (error) => {

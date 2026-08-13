@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="rick">
+<html lang="en" data-theme="rick" data-pack="rnm">
   <head>
     <meta charset="utf-8" />
     <meta
@@ -21,7 +21,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <title>BOFA Protocol</title>
-    <link rel="stylesheet" href="./styles.css?v=25" />
+    <link rel="stylesheet" href="./styles.css?v=26" />
   </head>
   <body>
     <div id="app">
@@ -61,6 +61,10 @@
         </button>
         <div id="theme-panel" class="theme-panel">
           <div class="theme-panel-inner">
+            <label class="pack-select-row" for="pack-select">
+              <span>Pack</span>
+              <select id="pack-select" aria-label="Character pack"></select>
+            </label>
             <div id="theme-row" class="theme-row" role="listbox" aria-label="Skins"></div>
           </div>
         </div>
@@ -237,13 +241,14 @@
         </div>
         <input id="import-file" type="file" accept="application/json" hidden />
         <p class="fine-print">
-          Pull or tap Skins for a character. Scores stay on this device.
+          Pull Skins, pick a pack, then a face. Scores stay on this device.
         </p>
       </div>
     </div>
 
     <div id="toast" class="toast" hidden></div>
-    <script src="./jokes.js?v=24" defer></script>
-    <script src="./app.js?v=24" defer></script>
+    <script src="./jokes.js?v=26" defer></script>
+    <script src="./jokes-wick.js?v=26" defer></script>
+    <script src="./app.js?v=26" defer></script>
   </body>
 </html>
