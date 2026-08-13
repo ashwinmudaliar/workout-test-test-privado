@@ -1,147 +1,192 @@
 #!/usr/bin/env python3
-"""Bofa skin: saggy two-lobe cartoon balls with a Time Cop mouth."""
+"""Bofa skin: two Rick-and-Morty-style Time Cops. Fan drawing, not a still."""
 from __future__ import annotations
 
 import math
-import random
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "themes" / "bofa"
 SIZE = 640
-BG = (18, 14, 12)
-OUTLINE = (8, 5, 5)
-MID = (220, 110, 104)
-DARK = (156, 52, 54)
-CREASE = (112, 36, 40)
-MOUTH = (20, 8, 10)
-GUM = (118, 34, 38)
-TOOTH = (236, 214, 118)
-TOOTH_EDGE = (90, 64, 28)
-HAIR = (32, 16, 12)
-
-# Two round bags. Right hangs lower. Deep saddle so it cannot read as one fruit.
-LEFT = (228, 350, 168, 128)
-RIGHT = (418, 500, 162, 122)
-
-
-def d_ell(x: float, y: float, cx: float, cy: float, rx: float, ry: float) -> float:
-    return ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2
+BG = (16, 12, 11)
+INK = (14, 8, 8)
+SKIN = (214, 92, 86)
+SKIN_DARK = (156, 52, 50)
+SKIN_LIT = (232, 132, 118)
+ROBE = (228, 214, 176)
+ROBE_DARK = (186, 168, 128)
+SATCHEL = (122, 74, 42)
+SATCHEL_DARK = (86, 50, 28)
+MOUTH = (28, 10, 12)
+TOOTH = (240, 216, 120)
+TOOTH_EDGE = (120, 84, 36)
+HAIR = (40, 18, 14)
+VEIN = (168, 58, 56)
 
 
-def inside(x: float, y: float) -> bool:
-    return d_ell(x, y, *LEFT) <= 1.0 or d_ell(x, y, *RIGHT) <= 1.0
+def outlined_ellipse(draw: ImageDraw.ImageDraw, box, fill, width=7):
+    x0, y0, x1, y1 = box
+    draw.ellipse((x0 - width, y0 - width, x1 + width, y1 + width), fill=INK)
+    draw.ellipse(box, fill=fill)
 
 
-def cel_body() -> Image.Image:
-    img = Image.new("RGB", (SIZE, SIZE), BG)
-    px = img.load()
-    for y in range(SIZE):
-        for x in range(SIZE):
-            dl = d_ell(x, y, *LEFT)
-            dr = d_ell(x, y, *RIGHT)
-            if dl > 1.0 and dr > 1.0:
-                continue
-            d = min(dl, dr)
-            cx, cy, rx, ry = LEFT if dl < dr else RIGHT
-            ly = (y - cy) / ry
-            underside = ly > 0.28
-            saddle = abs(x - 330) < 28 and 300 < y < 540
-            if d > 0.86 or underside or saddle:
-                px[x, y] = DARK
-            else:
-                px[x, y] = MID
-    return img
+def outlined_polygon(draw: ImageDraw.ImageDraw, pts, fill, width=6):
+    draw.line(pts + [pts[0]], fill=INK, width=width, joint="curve")
+    draw.polygon(pts, fill=fill)
 
 
-def outline(img: Image.Image) -> Image.Image:
-    mask = Image.new("L", (SIZE, SIZE), 0)
-    m = mask.load()
-    for y in range(SIZE):
-        for x in range(SIZE):
-            if inside(x, y):
-                m[x, y] = 255
-    grow = mask.filter(ImageFilter.MaxFilter(13))
-    shrink = mask.filter(ImageFilter.MinFilter(5))
-    gp, sp, ip = grow.load(), shrink.load(), img.load()
-    for y in range(SIZE):
-        for x in range(SIZE):
-            if gp[x, y] and not sp[x, y]:
-                ip[x, y] = OUTLINE
-    return img
-
-
-def details(draw: ImageDraw.ImageDraw, rng: random.Random) -> None:
-    # cleft
-    draw.line([(318, 250), (330, 330), (312, 410), (338, 500), (322, 560)], fill=CREASE, width=9, joint="curve")
-    draw.arc((90, 280, 370, 540), 50, 150, fill=CREASE, width=6)
-    draw.arc((280, 400, 590, 640), 40, 160, fill=CREASE, width=6)
-    draw.arc((120, 210, 350, 400), 200, 330, fill=CREASE, width=5)
-    draw.arc((320, 340, 560, 530), 200, 340, fill=CREASE, width=5)
-
-    # Time Cop mouth across the sag
-    box = (248, 470, 430, 600)
-    draw.ellipse(box, fill=MOUTH, outline=OUTLINE, width=9)
-    draw.arc((256, 476, 422, 530), 200, 340, fill=GUM, width=14)
-    draw.arc((262, 536, 416, 594), 20, 160, fill=GUM, width=12)
-    top = [
-        (262, 492, 288, 532, 3),
-        (290, 486, 316, 538, -4),
-        (318, 482, 344, 540, 5),
-        (346, 486, 372, 536, -3),
-        (374, 492, 398, 528, 4),
-    ]
-    bot = [
-        (268, 586, 292, 550, -3),
-        (294, 590, 320, 546, 5),
-        (322, 592, 348, 544, -4),
-        (350, 588, 376, 548, 3),
-        (378, 582, 402, 554, -3),
-    ]
-    for x0, y0, x1, y1, lean in top:
-        draw.polygon(
-            [(x0 + lean, y0), (x1 + lean, y0), (x1, y1), (x0, y1 - 6)],
-            fill=TOOTH,
-            outline=TOOTH_EDGE,
+def tooth_ring(draw: ImageDraw.ImageDraw, cx, cy, rx, ry, n=14, inward=22):
+    for i in range(n):
+        a0 = (i - 0.28) / n * math.tau
+        a1 = (i + 0.28) / n * math.tau
+        am = i / n * math.tau
+        jitter = 0.7 + (i * 37 % 5) * 0.08
+        p0 = (cx + math.cos(a0) * rx, cy + math.sin(a0) * ry)
+        p1 = (cx + math.cos(a1) * rx, cy + math.sin(a1) * ry)
+        p2 = (
+            cx + math.cos(am) * (rx - inward * jitter),
+            cy + math.sin(am) * (ry - inward * jitter),
         )
-    for x0, y0, x1, y1, lean in bot:
-        draw.polygon(
-            [(x0, y1), (x1, y1), (x1 + lean, y0), (x0 + lean, y0)],
-            fill=TOOTH,
-            outline=TOOTH_EDGE,
+        draw.polygon([p0, p1, p2], fill=TOOTH, outline=TOOTH_EDGE)
+
+
+def arm(draw: ImageDraw.ImageDraw, pts, hand, s):
+    draw.line(pts, fill=INK, width=int(15 * s), joint="curve")
+    draw.line(pts, fill=SKIN, width=int(9 * s), joint="curve")
+    hx, hy = hand
+    for dx, dy in ((-7, 4), (0, 8), (7, 3), (10, -2)):
+        outlined_ellipse(
+            draw,
+            (hx + dx * s - 5 * s, hy + dy * s - 4 * s, hx + dx * s + 5 * s, hy + dy * s + 4 * s),
+            SKIN,
+            width=2,
         )
 
-    # curly pubes from the top of each bag
-    roots = [
-        (180, 230), (210, 214), (248, 208), (280, 218),
-        (360, 300), (400, 340), (440, 360), (470, 390),
-        (160, 260), (490, 420),
+
+def time_cop(draw: ImageDraw.ImageDraw, cx: float, cy: float, s: float, face: int) -> None:
+    # tattered robe hanging under the head
+    robe = [
+        (cx - 78 * s, cy + 62 * s),
+        (cx + 78 * s, cy + 62 * s),
+        (cx + 108 * s, cy + 210 * s),
+        (cx + 62 * s, cy + 188 * s),
+        (cx + 28 * s, cy + 224 * s),
+        (cx - 8 * s, cy + 192 * s),
+        (cx - 48 * s, cy + 226 * s),
+        (cx - 88 * s, cy + 186 * s),
+        (cx - 112 * s, cy + 216 * s),
     ]
-    for x, y in roots:
-        if not inside(x, y):
-            continue
-        ang = rng.uniform(-2.7, -0.4)
-        pts = [(x, y)]
-        px, py = x, y
-        for _ in range(6):
-            ang += rng.uniform(-0.7, 0.7)
-            px += math.cos(ang) * 5.5
-            py += math.sin(ang) * 5.5
-            pts.append((px, py))
-        draw.line(pts, fill=HAIR, width=5, joint="curve")
+    outlined_polygon(draw, robe, ROBE, width=6)
+    draw.polygon(
+        [
+            (cx - 20 * s, cy + 80 * s),
+            (cx + 70 * s, cy + 90 * s),
+            (cx + 90 * s, cy + 200 * s),
+            (cx + 10 * s, cy + 170 * s),
+        ],
+        fill=ROBE_DARK,
+    )
+
+    # satchel
+    bag = [
+        (cx + 18 * s, cy + 118 * s),
+        (cx + 78 * s, cy + 112 * s),
+        (cx + 84 * s, cy + 168 * s),
+        (cx + 22 * s, cy + 174 * s),
+    ]
+    outlined_polygon(draw, bag, SATCHEL, width=4)
+    draw.line(
+        [(cx + 18 * s, cy + 70 * s), (cx + 48 * s, cy + 118 * s)],
+        fill=INK,
+        width=4,
+    )
+    draw.ellipse(
+        (cx + 40 * s, cy + 128 * s, cx + 62 * s, cy + 150 * s),
+        fill=SATCHEL_DARK,
+        outline=INK,
+        width=2,
+    )
+
+    # thin arms
+    if face == 0:
+        arm(
+            draw,
+            [(cx - 70 * s, cy + 40 * s), (cx - 130 * s, cy + 90 * s), (cx - 150 * s, cy + 150 * s)],
+            (cx - 152 * s, cy + 156 * s),
+            s,
+        )
+        arm(
+            draw,
+            [(cx + 72 * s, cy + 48 * s), (cx + 120 * s, cy + 110 * s), (cx + 96 * s, cy + 150 * s)],
+            (cx + 94 * s, cy + 154 * s),
+            s,
+        )
+    else:
+        arm(
+            draw,
+            [(cx + 74 * s, cy + 38 * s), (cx + 140 * s, cy + 70 * s), (cx + 158 * s, cy + 140 * s)],
+            (cx + 160 * s, cy + 146 * s),
+            s,
+        )
+        arm(
+            draw,
+            [(cx - 72 * s, cy + 50 * s), (cx - 110 * s, cy + 120 * s), (cx - 70 * s, cy + 155 * s)],
+            (cx - 66 * s, cy + 158 * s),
+            s,
+        )
+
+    # testicle head
+    head = (cx - 98 * s, cy - 108 * s, cx + 98 * s, cy + 102 * s)
+    outlined_ellipse(draw, head, SKIN, width=8)
+    draw.ellipse((cx - 20 * s, cy - 70 * s, cx + 90 * s, cy + 90 * s), fill=SKIN_DARK)
+    draw.ellipse((cx - 80 * s, cy - 90 * s, cx - 10 * s, cy - 20 * s), fill=SKIN_LIT)
+    draw.arc(
+        (cx - 70 * s, cy - 40 * s, cx - 20 * s, cy + 40 * s),
+        200,
+        320,
+        fill=VEIN,
+        width=3,
+    )
+    draw.arc(
+        (cx + 20 * s, cy - 10 * s, cx + 80 * s, cy + 70 * s),
+        20,
+        140,
+        fill=VEIN,
+        width=3,
+    )
+
+    # circular maw with inward fangs
+    mx, my, mrx, mry = cx, cy + 18 * s, 62 * s, 58 * s
+    outlined_ellipse(
+        draw,
+        (mx - mrx, my - mry, mx + mrx, my + mry),
+        MOUTH,
+        width=6,
+    )
+    tooth_ring(draw, mx, my, mrx - 2 * s, mry - 2 * s, n=13, inward=20 * s)
+
+    # a few sparse hairs on top of the head
+    for i, (dx, dy, ang) in enumerate(
+        ((-40, -96, -1.9), (-12, -108, -1.6), (18, -104, -1.4), (48, -92, -1.1))
+    ):
+        x0, y0 = cx + dx * s, cy + dy * s
+        x1 = x0 + math.cos(ang) * 16 * s
+        y1 = y0 + math.sin(ang) * 16 * s
+        draw.line((x0, y0, x1, y1), fill=HAIR, width=3)
 
 
 def render() -> None:
-    rng = random.Random(4)
     OUT.mkdir(parents=True, exist_ok=True)
-    img = cel_body()
-    img = outline(img)
-    details(ImageDraw.Draw(img), rng)
+    img = Image.new("RGB", (SIZE, SIZE), BG)
+    draw = ImageDraw.Draw(img)
+    # two cops, left a hair bigger, right a step lower
+    time_cop(draw, 214, 268, 1.02, face=0)
+    time_cop(draw, 430, 292, 0.96, face=1)
     bust = img.resize((640, 640), Image.Resampling.LANCZOS)
     bust.save(OUT / "bust.jpg", "JPEG", quality=92, optimize=True)
-    mark = img.crop((20, 150, 620, 640)).resize((256, 256), Image.Resampling.LANCZOS)
+    mark = img.crop((40, 80, 600, 500)).resize((256, 256), Image.Resampling.LANCZOS)
     mark.save(OUT / "mark.jpg", "JPEG", quality=92, optimize=True)
     print("wrote", OUT / "bust.jpg", OUT / "mark.jpg")
 
