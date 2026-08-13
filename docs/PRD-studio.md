@@ -23,7 +23,8 @@ Everything below is either **ops for that timer** or a **different app pretendin
 - Skins are hardcoded: theme tokens, `bust.jpg` / `mark.jpg`, 32-line quote pools, a service-worker cache bump, a Pages deploy.
 - iOS home-screen PWA **cannot** talk to HealthKit. Not with a flag. Not with a library. Native wrapper or no.
 - Image models already refused explicit anatomy and once drew a man who looked like a predator. “Generate pictures” is not a button, it is a review queue.
-- Disney, Warner, NFL, NBA, and whatever holds John Wick will not care that it is a joke. Official likenesses and logos are out. Fan-style original caricature is the only honest path, and even that can get a letter if you get lazy.
+- Image models already refused explicit anatomy and once drew a man who looked like a predator. “Generate pictures” is not a button, it is a review queue.
+- This GitHub Pages URL is public. Typing “Star Wars” into a private studio does not make a Vader face on github.io “personal use.” Personal means the pack lives on your phone / behind Studio auth, not on the live PWA.
 
 If a requirement below needs accounts, a CMS, or a native binary, say so in the requirement. Do not hide it behind “elegant UI.”
 
@@ -45,15 +46,16 @@ If a requirement below needs accounts, a CMS, or a native binary, say so in the 
 
 - You can inspect your own training without leaving the phone.
 - You can mint a new character pack without editing `app.js` by hand.
-- You never ship a pack that sexualizes a minor, uses an official still, or goes out without a human looking at the art and the lines.
+- You never enable a pack that sexualizes a minor, or that you have not at least glanced at.
+- Franchise packs are for you, not for the public site.
 - Health data, if it happens at all, is an explicit native-app decision.
 
 ## Non-goals (this round)
 
 - Multiplayer, social, leaderboards, or other people’s workouts.
 - A general-purpose CMS for arbitrary apps.
-- Official IP, team logos, or photoreal celebrity faces.
-- Auto-publish from a model with no review.
+- Publishing franchise packs to the public Pages app.
+- Auto-enable a pack you have not opened.
 - Android Health Connect until HealthKit is real or killed.
 - Redesigning the AMRAP itself.
 
@@ -97,83 +99,115 @@ You log rounds. You cannot see them except as three pills and a log list. That i
 
 Rename in the product: **Packs**, not “clusters.” Cluster sounds like ML. Pack is a tray of faces.
 
-A pack is: id, display name, default character, legal notes, and N characters. A character is: id, name, kicker, timer labels, palette, mark, bust, quote pool (≥32 lines, each containing `deez nuts` unless a pack-level rule says otherwise), plus a voice bible.
+**Audience:** you. Not a store. Not other users. That is the product constraint. It is not a copyright spell. Personal use means packs stay in Studio on your device (or behind your login). It does **not** mean “dump Keanu and Vader onto the public Pages site.” The live AMRAP can keep the current Rick and Morty / Bofa pack. Franchise packs you type in do not auto-deploy to github.io.
 
-Rick and Morty is pack `rnm`. Bofa Time Cops sit in it or in a `bofa` pack. Star Wars would be pack `sw-fan` — original caricatures, not Disney assets.
+A pack is: id, display name (usually your prompt), default character, and up to **10** characters. A character is: id, name, kicker, timer labels, palette, mark, bust, quote pool (≥32 lines, each containing `deez nuts` unless a pack-level rule says otherwise), plus a voice bible used only during generation.
 
-### Why this is hard (on purpose)
+Rick and Morty is pack `rnm`. Bofa Time Cops sit in it.
 
-You did not like leftover header icons, a pike that was supposed to be doggy, a Walken who looked like Epstein, or balls that looked like a kiwi. The factory has to make that loop **shorter**, not more magical. Magic is how you ship another face you hate, faster.
+### The flow you want (this is the spec)
 
-### Requirements
+One wizard. Four screens. No extra fields until you ask for them.
 
-**Pack lifecycle**
+**1. Prompt**
 
-1. Create pack: name, one-line brief (“John Wick, dry, violent, hotel, pencils”), rating (the existing app is adult), off-limits list.
-2. Suggest 6–12 characters from the brief. You pick 4–8. No pack bigger than 8 until the tray is redesigned; the current tray is a horizontal face row.
-3. For each character: generate mark (256²) + bust (640²), palette, labels, kicker, 32 quotes.
-4. Human review: reject / regen art / regen lines / approve. Nothing is live until approve.
-5. Publish writes a pack JSON + images the PWA can load. Unpublished packs never appear in Skins.
+Full-screen. One question, huge:
 
-**Suggestions**
+> What sort of character pack do you want to create?
 
-- Model proposes names + one-sentence voice. You tap to keep.
-- Hard rails: flag likely minors (padawans, younglings, hobbit children, “rookie” athletes under 18). Those cannot enter the quote pipeline.
-- Sports packs: original mascot-like figures in team *colors*, not trademarks. If you cannot tell it is a joke caricature, regen.
+One text box. Placeholder: `John Wick`, `Star Wars`, `the 2010s Heat`, `my coworkers`. Keyboard open. Primary button: **Next**. Empty submit is blocked.
 
-**Art**
+That string *is* the pack brief and the pack name until you rename it later. Do not make them fill vibe / rating / off-limits on this screen. Infer adult-cast from the existing app. Offer an optional “adult characters only” confirm only if the prompt looks like it includes kids (Star Wars, LOTR, high school sports).
 
-- Same contract as today: cartoon, original, not a still, not photoreal.
-- Two shots: header mark (face) and timer bust (shoulders-up or creature bust).
-- Regen is cheap. Approve is the expensive step. Show mark at 48px and bust in the timer mock, on the phone, before approve. If it looks like a kiwi at 48px, it is a kiwi.
+**2. Cast — suggestions, up to 10**
 
-**Quotes**
+Backend returns up to **10** character suggestions from the prompt (name + one-line why). Screen is a selectable list:
 
-- Keep the rule that worked: multiple writers, different cadences, one editor pass, 32 keepers.
-- Each character gets a voice bible (6–10 bullets). Writers do not see other packs.
-- A critic agent rejects: missing `deez nuts`, wrong voice, minor-sexual content, generic bro-gym, duplicate punchlines.
-- You still read them. The critic is a filter, not a publisher.
+- Tap to select / deselect
+- Selected count in the header, e.g. `4 of 10`
+- **Add someone** at the bottom: type a name, they join the list selected
+- Cannot select more than 10. If they add an 11th, they drop someone or we refuse
+- Primary button: **Create pack** — disabled at 0 selected
 
-**Backend (this is the tax)**
+No art yet. Placeholders only. This screen is cheap and should feel instant.
 
-Today publish = git commit. A factory implies:
+**3. Building**
 
-- Auth: you, maybe a password, not “toggle.”
-- Object storage for images.
-- A pack manifest the PWA fetches (`packs/{id}/pack.json`) with cache-busting.
-- The workout app stays dumb: download pack, apply theme. No generate-on-device.
+You leave. The backend does the work for every selected character, in parallel where it can:
 
-Do not put OpenAI keys in the PWA. Generation runs on a server or in a Cloud Agent. The phone only reviews and enables.
+- Voice bible
+- Timer labels + kicker + palette
+- Mark (256²) + bust (640²)
+- 32 quotes via the multi-agent writers + critic
 
-**Mobile UX (this is the part you actually asked to be elegant)**
+Phone shows a single progress screen: pack name, `3 / 7 characters`, current step (`quotes`, `art`). You can background it. You cannot start a second pack until this one finishes or you cancel.
 
-Studio is a full-screen wizard, not a nested settings page.
+**4. Ready**
 
-1. **Packs** — list, one primary button: New pack.
-2. **Brief** — name, vibe, off-limits. Big type, few fields.
-3. **Cast** — suggestion chips, tap to add, long-press to drop. Max 8. Faces are placeholders until art lands.
-4. **Generate** — per character: spinner, then a review card (mark + 3 sample lines + labels). Swipe reject, tap regen art / regen lines, tap keep.
-5. **Publish** — preview the real Skins tray and one workout frame. Then enable.
+Not a spreadsheet. A tray preview of the new faces plus one sample line each. Actions:
 
-If a step needs a table, it is wrong for this phone.
+- **Use this pack** — enables it on the workout tray (on-device / private)
+- **Regen** on a single face (art, lines, or both)
+- **Drop** a character
+- **Back to cast** only if they want to add someone; that queues generation for the new names only
 
-### Legal / safety rails (non-negotiable)
+No per-character approve gauntlet during generation. You asked the machine to make the pack; it makes the pack. The ready screen is the escape hatch for the next Epstein / kiwi, not a second product.
 
-- No official stills, logos, wordmarks as marks.
-- No sexualized anyone who is or reads as a minor. Pack brief must state “adult characters only.”
-- Display name can say “Wick-ish” or “a desert farm boy.” It cannot say “Official Star Wars Pack.”
-- Kill switch: disable a pack remotely (or by flipping `enabled: false` in the manifest) without waiting for App Store.
+### Why “create it all” still needs that last screen
+
+You have already rejected art the pipeline was proud of. If step 4 auto-enables with no look, you will get a bad face on the timer mid-workout. Glance, then use. That is still your flow.
+
+### Suggestions
+
+- Up to 10. Rank by “would this be funny yelling deez nuts during squats,” not by franchise completeness. Skip the boring ones (C-3PO unless they ask).
+- **Minors are not a copyright issue, they are a hard no.** If the prompt is Star Wars, do not suggest younglings, kid Anakin, or Grogu as a sexualized bit. If a suggestion reads under 18, it comes back flagged and unselectable. Same for school teams.
+- Add-your-own is free text. Same minor check on the name + a yes/no “this is an adult.”
+
+### Art + quotes (backend, after cast is locked)
+
+- Cartoon caricature in the pack’s world. Not a film still, not a PNG ripped from Google.
+- Two shots per character: header mark, timer bust. Generate at 48px preview in the ready screen or you will approve a kiwi.
+- Quotes: three writers, different cadences, critic rejects misses, keep 32. Voice of that character, punch is `deez nuts`, gym-readable.
+- Failures: if art is blocked (safety) or quotes come back short, that character sits in Ready as **failed** with Regen. Do not kill the whole pack.
+
+### Backend
+
+Generation does not run in the PWA. No keys on the phone.
+
+- Studio auth: you.
+- Job: `{prompt, characterNames[]}` → pack artifact.
+- Store images + `pack.json` in private storage.
+- Workout app pulls **enabled private packs** from that store when you are logged into Studio, or keeps them in device storage. Public Pages keeps shipping the current hardcoded pack until you explicitly say “put this on github.io.”
+
+### Mobile UX notes
+
+- Prompt screen is 80% text field. That is the elegance.
+- Cast is a checklist with big hit targets, not chips that wrap into mush.
+- Building is allowed to be boring. A progress bar that tells the truth beats a fake animation.
+- Ready is the skins tray you already have, plus a sample line. If it needs a tutorial, the tray failed.
+
+### Personal use (what that actually means)
+
+| You can | You cannot pretend |
+|---|---|
+| Type John Wick / Star Wars / Lakers | That copyright vanished |
+| Keep the pack on your phone | That github.io is private |
+| Generate caricatures that look like the bit | That a still from the movie is fine to commit |
+
+Safety rails that stay even for you: no sexualized minors, no CSAM, no packing someone else’s nudes. “Personal” does not cover that.
 
 ### Non-goals
 
-- User-generated packs from strangers.
-- Infinite characters. Eight is the tray.
+- Other people creating packs.
+- More than 10 faces in a pack (tray death).
+- Auto-push to the public site.
+- Filling out a brand-guidelines form before the prompt.
 
 ### Open questions
 
-- Does a pack replace Rick and Morty in the tray, or append? (Recommendation: one active pack at a time. Eight faces is already a lot. Switching packs is a Studio/Settings action, not another handle.)
-- Who pays for generation? Per-pack cost should be visible in Studio before you hit Generate.
-- Do quotes stay 32 forever or scale with a “tap for another” boredom factor?
+- One active pack at a time, or append? **Default: replace the tray with the new pack.** Switching packs is Settings → Packs. Two handles on the workout screen is how you miss the clock.
+- If generation takes 8 minutes, is push notification required, or is “leave this screen open” enough for v1?
+- Rename pack after prompt? Default: pack title = the prompt string.
 
 ---
 
@@ -229,8 +263,8 @@ No Admin toggle on the workout header. Studio is behind Settings, ideally a PIN 
 
 1. **Stats in Settings** — cheapest honesty check. If you do not open it after a week, you did not want metrics.
 2. **Pack format + fetch** — extract Rick and Morty into a pack JSON the PWA already understands. No generator yet. Prove you can add a face without editing `THEMES` in `app.js`.
-3. **Studio wizard on a branch** — suggestions + review UI against fake data.
-4. **Generation pipeline** — art + multi-agent quotes + critic, still requiring your approve.
+3. **Studio wizard** — prompt → 10 suggestions → select/add → Create pack.
+4. **Generation pipeline** — batch art + quotes after cast lock; Ready screen to glance / regen / use.
 5. **HealthKit** — only after you decide the app is allowed to become native. Otherwise delete the ticket.
 
 Do not start 3–5 in parallel. You will get a CMS that cannot publish and a Health app that cannot run.
@@ -241,11 +275,11 @@ Do not start 3–5 in parallel. You will get a CMS that cannot publish and a Hea
 
 - Top-left Admin toggle. Dead.
 - “Create metrics” as a generic constructor. One named custom field or nothing.
-- Official franchises as labeled packs. Inspired packs only.
+- Official franchise packs on the public Pages site.
 - HealthKit until native is a real decision.
-- Any generate-and-auto-ship path. You have already seen why.
+- Auto-enable with no Ready screen.
 
-What I would not cut: **one active pack, eight faces, a phone wizard that makes saying no to a bad drawing easy.** That is the whole game.
+What I would not cut: **type a world, pick up to 10 faces, walk away while it builds, glance once, use.** That is the whole game.
 
 ---
 
@@ -254,9 +288,11 @@ What I would not cut: **one active pack, eight faces, a phone wizard that makes 
 - Workout screen has no Admin control.
 - Stats show last-14 from real localStorage without a network.
 - A pack can be disabled and the tray falls back to the previous pack without a code edit.
-- A suggested character flagged as a minor cannot reach quote generation.
-- Approved art is inspected at 48px mark size, not just 640.
+- A suggested character flagged as a minor cannot be selected or typed in without an adult confirm, and never gets sexualized lines.
+- Ready screen shows mark at 48px, not just 640.
 - Every published line contains the required punch or the pack’s documented exception.
+- Create pack does not enable the pack until Use this pack.
+- A franchise pack does not appear on the public Pages app unless you explicitly publish it there.
 - HealthKit write happens only after OS permission and only for a saved workout; deny does not break the timer.
 - No API keys in the static PWA.
 
@@ -269,8 +305,11 @@ What I would not cut: **one active pack, eight faces, a phone wizard that makes 
 | Admin on workout header | No |
 | Metrics | Personal stats only |
 | Packs vs clusters | Call them packs |
-| Tray | One active pack, max 8 |
-| IP | Original caricature, never official |
-| Publish | Human approve required |
+| Tray | One active pack, max 10 |
+| Prompt | Single free-text brief |
+| Cast | Up to 10 suggestions; select or add |
+| Generate | Batch on the backend after Create pack |
+| IP | Personal/private packs OK to prompt; no public Pages dump; no film stills |
+| Enable | Ready screen first, then Use this pack |
 | HealthKit | Blocked on native-app decision |
 | Backend | Required for factory; not required for stats |
