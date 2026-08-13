@@ -103,11 +103,9 @@ input:focus-visible {
   min-width: 0;
 }
 
-.mark,
 .theme-mark {
   width: 64px;
   height: 64px;
-  color: var(--accent);
   flex-shrink: 0;
 }
 

@@ -162,7 +162,6 @@
     settingsClose: document.getElementById("settings-close"),
     toast: document.getElementById("toast"),
     app: document.getElementById("app"),
-    defaultMark: document.getElementById("default-mark"),
     themeMark: document.getElementById("theme-mark"),
     themeBust: document.getElementById("theme-bust"),
     themeTray: document.getElementById("theme-tray"),
@@ -591,10 +590,8 @@
     if (theme.mark) {
       els.themeMark.src = theme.mark;
       els.themeMark.hidden = false;
-      els.defaultMark.hidden = true;
     } else {
       els.themeMark.hidden = true;
-      els.defaultMark.hidden = false;
     }
     if (theme.bust) {
       els.themeBust.src = theme.bust;
@@ -996,7 +993,7 @@
 
   if ("serviceWorker" in navigator) {
     let hadController = Boolean(navigator.serviceWorker.controller);
-    navigator.serviceWorker.register("./sw.js?v=13", { updateViaCache: "none" });
+    navigator.serviceWorker.register("./sw.js?v=14", { updateViaCache: "none" });
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (!hadController) {
         hadController = true;

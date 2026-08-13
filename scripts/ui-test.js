@@ -88,6 +88,9 @@ const puppeteer = require("puppeteer-core");
   }
   const kicker = await page.$eval("#bit-card .bit-kicker", (el) => el.textContent.trim());
   if (kicker !== "Rick") throw new Error(`expected Rick kicker, got ${kicker}`);
+  if (await page.$("#default-mark")) throw new Error("20 mark should be gone from the header");
+  const markHidden = await page.$eval("#theme-mark", (el) => el.hidden);
+  if (markHidden) throw new Error("character mark should show for Rick");
 
   await page.screenshot({ path: "/tmp/amrap-log.png" });
   console.log("ui tests ok");
