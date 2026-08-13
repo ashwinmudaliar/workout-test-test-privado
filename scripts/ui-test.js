@@ -46,18 +46,20 @@ const puppeteer = require("puppeteer-core");
   const today = Object.values(stored.workouts)[0];
   if (!today || today.rounds !== 14) throw new Error("workout was not saved");
 
-  await page.click('.tab[data-view="log"]');
-  const history = await page.$eval("#history", (el) => el.textContent);
-  if (!history.includes("14")) throw new Error("history missing saved score");
-
-  const line = await page.$eval(".view.is-active .bit-line", (el) => el.textContent.trim());
-  if (!line) throw new Error("expected a rotating line under the log");
+  const line = await page.$eval("#bit-line", (el) => el.textContent.trim());
+  if (!line) throw new Error("expected a rotating line under the timer");
   if (!/deez nuts|sunken place|handshake/i.test(line)) {
     throw new Error(`unexpected opening line: ${line}`);
   }
-  await page.$eval(".view.is-active .bit-card", (el) => el.click());
-  const nextLine = await page.$eval(".view.is-active .bit-line", (el) => el.textContent.trim());
+  await page.click("#bit-card");
+  const nextLine = await page.$eval("#bit-line", (el) => el.textContent.trim());
   if (nextLine === line) throw new Error("tapping the line should rotate it");
+
+  await page.click('.tab[data-view="log"]');
+  const history = await page.$eval("#history", (el) => el.textContent);
+  if (!history.includes("14")) throw new Error("history missing saved score");
+  const logHasBit = await page.$("#view-log .bit-card");
+  if (logHasBit) throw new Error("quote card should not be on the log");
 
   await page.click("#theme-handle");
   await page.waitForFunction(() => document.querySelector("#theme-tray").classList.contains("is-open"));

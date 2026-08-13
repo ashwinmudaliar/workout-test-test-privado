@@ -21,7 +21,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <title>AMRAP</title>
-    <link rel="stylesheet" href="./styles.css?v=8" />
+    <link rel="stylesheet" href="./styles.css?v=9" />
   </head>
   <body>
     <div id="app">
@@ -136,6 +136,11 @@
               <p class="rounds-label">Rounds</p>
               <p id="rounds" class="rounds">0</p>
             </div>
+            <button type="button" id="bit-card" class="bit-card" aria-label="Next line">
+              <span class="bit-kicker">Peele dept.</span>
+              <span id="bit-line" class="bit-line"></span>
+              <span class="bit-hint">Tap for another</span>
+            </button>
           </div>
 
           <ul class="movements" id="movements">
@@ -176,11 +181,6 @@
             <button type="button" id="quick-log-btn" class="text-btn muted center">
               Already finished? Log rounds
             </button>
-            <button type="button" id="bit-card" class="bit-card" aria-label="Next line">
-              <span class="bit-kicker">Peele dept.</span>
-              <span id="bit-line" class="bit-line"></span>
-              <span class="bit-hint">Tap for another</span>
-            </button>
           </div>
         </section>
 
@@ -199,11 +199,6 @@
             </div>
           </div>
           <ol id="history" class="history"></ol>
-          <button type="button" class="bit-card" aria-label="Next line">
-            <span class="bit-kicker">Peele dept.</span>
-            <span class="bit-line"></span>
-            <span class="bit-hint">Tap for another</span>
-          </button>
         </section>
       </main>
     </div>
@@ -249,6 +244,6 @@
     </div>
 
     <div id="toast" class="toast" hidden></div>
-    <script src="./app.js?v=8" defer></script>
+    <script src="./app.js?v=9" defer></script>
   </body>
 </html>

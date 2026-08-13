@@ -1,4 +1,4 @@
-const CACHE = "amrap-v8";
+const CACHE = "amrap-v9";
 const ASSETS = [
   "./",
   "./index.html",
