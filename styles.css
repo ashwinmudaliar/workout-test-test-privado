@@ -223,6 +223,26 @@ input:focus-visible {
   width: 100%;
   margin: 0;
   aspect-ratio: 1;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  border-radius: 50%;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+.timer-wrap:active {
+  transform: scale(0.97);
+}
+
+.timer-wrap.is-paused .ring-value {
+  stroke: color-mix(in srgb, var(--lime) 45%, #666);
+}
+
+.timer-wrap.is-paused .clock {
+  opacity: 0.8;
 }
 
 .ring,

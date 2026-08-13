@@ -19,19 +19,15 @@
       workout: document.getElementById("view-workout"),
       log: document.getElementById("view-log"),
     },
-    timerWrap: document.querySelector(".timer-wrap"),
+    timerWrap: document.getElementById("timer-btn"),
     ring: document.getElementById("ring-value"),
     timerLabel: document.getElementById("timer-label"),
     clock: document.getElementById("clock"),
+    timerCap: document.getElementById("timer-cap"),
     movements: document.querySelectorAll(".movement"),
     rounds: document.getElementById("rounds"),
     undoBtn: document.getElementById("undo-btn"),
     roundBtn: document.getElementById("round-btn"),
-    primaryRow: document.getElementById("primary-row"),
-    primaryBtn: document.getElementById("primary-btn"),
-    pausedRow: document.getElementById("paused-row"),
-    resetBtn: document.getElementById("reset-btn"),
-    resumeBtn: document.getElementById("resume-btn"),
     doneRow: document.getElementById("done-row"),
     saveBtn: document.getElementById("save-btn"),
     discardBtn: document.getElementById("discard-btn"),
@@ -362,18 +358,34 @@
   function renderTimer() {
     const remaining = remainingNow();
     const progress = remaining / WORKOUT_MS;
+    const status = state.live.status;
     els.clock.textContent = formatTime(remaining);
     els.ring.style.strokeDasharray = String(RING);
     els.ring.style.strokeDashoffset = String(RING * (1 - progress));
     els.timerWrap.classList.toggle("is-low", remaining > 0 && remaining <= 60_000);
     els.timerWrap.classList.toggle("is-pulse", remaining > 0 && remaining <= 10_000);
+    els.timerWrap.classList.toggle("is-paused", status === "paused");
     const labels = {
-      idle: "Ready",
-      running: "Go",
-      paused: "Paused",
+      idle: "Tap to start",
+      running: "Tap to pause",
+      paused: "Tap to go",
       finished: "Time",
     };
-    els.timerLabel.textContent = labels[state.live.status];
+    const caps = {
+      idle: "20:00 cap",
+      running: "hold to restart",
+      paused: "hold to restart",
+      finished: "20:00 cap",
+    };
+    const aria = {
+      idle: "Start workout",
+      running: "Pause workout",
+      paused: "Resume workout",
+      finished: "Workout finished",
+    };
+    els.timerLabel.textContent = labels[status];
+    els.timerCap.textContent = caps[status];
+    els.timerWrap.setAttribute("aria-label", aria[status]);
   }
 
   function renderRounds() {
@@ -391,14 +403,14 @@
 
   function renderControls() {
     const status = state.live.status;
-    els.primaryRow.hidden = status !== "idle" && status !== "running";
-    els.pausedRow.hidden = status !== "paused";
     els.doneRow.hidden = status !== "finished";
     els.quickLogBtn.hidden = status === "running" || status === "finished";
-    els.primaryBtn.textContent = status === "running" ? "Pause" : "Start";
-    els.primaryBtn.classList.toggle("ghost", status === "running");
-    els.primaryBtn.classList.toggle("lime", status !== "running");
-    els.primaryBtn.classList.toggle("primary", status !== "running");
+  }
+
+  function toggleTimer() {
+    const status = state.live.status;
+    if (status === "running") pauseClock();
+    else if (status === "idle" || status === "paused") startClock();
   }
 
   function renderStats() {
@@ -555,12 +567,39 @@
   els.roundBtn.addEventListener("click", addRound);
   els.undoBtn.addEventListener("click", undoRound);
 
-  els.primaryBtn.addEventListener("click", () => {
-    if (state.live.status === "running") pauseClock();
-    else startClock();
+  let holdTimer = 0;
+  let didHold = false;
+  const HOLD_MS = 600;
+
+  function clearHold() {
+    clearTimeout(holdTimer);
+    holdTimer = 0;
+  }
+
+  els.timerWrap.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    didHold = false;
+    clearHold();
+    holdTimer = setTimeout(() => {
+      didHold = true;
+      if (state.live.status === "idle") return;
+      buzz(24);
+      resetClock(false);
+    }, HOLD_MS);
   });
-  els.resumeBtn.addEventListener("click", startClock);
-  els.resetBtn.addEventListener("click", () => resetClock(false));
+  els.timerWrap.addEventListener("pointerup", clearHold);
+  els.timerWrap.addEventListener("pointercancel", clearHold);
+  els.timerWrap.addEventListener("pointerleave", clearHold);
+  els.timerWrap.addEventListener("contextmenu", (event) => event.preventDefault());
+  els.timerWrap.addEventListener("click", (event) => {
+    if (didHold) {
+      event.preventDefault();
+      didHold = false;
+      return;
+    }
+    toggleTimer();
+  });
+
   els.discardBtn.addEventListener("click", () => resetClock(true));
   els.saveBtn.addEventListener("click", () => {
     if (!confirmReplaceToday()) return;

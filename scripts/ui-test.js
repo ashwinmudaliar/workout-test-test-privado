@@ -10,11 +10,11 @@ const puppeteer = require("puppeteer-core");
   const page = await browser.newPage();
   await page.goto("http://127.0.0.1:8765/", { waitUntil: "domcontentloaded", timeout: 15000 });
 
-  const startLabel = await page.$eval("#primary-btn", (el) => el.textContent.trim());
-  if (startLabel !== "Start") throw new Error(`expected Start, got ${startLabel}`);
+  const startLabel = await page.$eval("#timer-label", (el) => el.textContent.trim());
+  if (startLabel !== "Tap to start") throw new Error(`expected Tap to start, got ${startLabel}`);
 
-  await page.click("#primary-btn");
-  await page.waitForFunction(() => document.querySelector("#timer-label").textContent === "Go");
+  await page.click("#timer-btn");
+  await page.waitForFunction(() => document.querySelector("#timer-label").textContent === "Tap to pause");
   await page.click("#round-btn");
   await page.click("#round-btn");
   const rounds = await page.$eval("#rounds", (el) => el.textContent.trim());
@@ -30,8 +30,8 @@ const puppeteer = require("puppeteer-core");
   const undone = await page.$eval("#rounds", (el) => el.textContent.trim());
   if (undone !== "2") throw new Error(`undo should drop to 2, got ${undone}`);
 
-  await page.click("#primary-btn");
-  await page.waitForFunction(() => document.querySelector("#timer-label").textContent === "Paused");
+  await page.click("#timer-btn");
+  await page.waitForFunction(() => document.querySelector("#timer-label").textContent === "Tap to go");
 
   await page.click("#quick-log-btn");
   await page.waitForSelector("#modal:not([hidden])");

@@ -102,17 +102,17 @@
       <main>
         <section id="view-workout" class="view is-active">
           <div class="hero">
-            <div class="timer-wrap">
+            <button type="button" class="timer-wrap" id="timer-btn" aria-label="Start workout">
               <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
                 <circle class="ring-track" cx="60" cy="60" r="54" />
                 <circle id="ring-value" class="ring-value" cx="60" cy="60" r="54" />
               </svg>
               <div class="timer-readout">
-                <p id="timer-label" class="timer-label">Ready</p>
+                <p id="timer-label" class="timer-label">Tap to start</p>
                 <p id="clock" class="clock" aria-live="polite">20:00</p>
-                <p class="cap">20:00 cap</p>
+                <p id="timer-cap" class="cap">20:00 cap</p>
               </div>
-            </div>
+            </button>
             <div class="rounds-block">
               <p class="rounds-label">Rounds</p>
               <p id="rounds" class="rounds">0</p>
@@ -149,13 +149,6 @@
                 −
               </button>
               <button type="button" id="round-btn" class="btn lime">+ Round</button>
-            </div>
-            <div id="primary-row" class="primary-row">
-              <button type="button" id="primary-btn" class="btn primary">Start</button>
-            </div>
-            <div id="paused-row" class="primary-row" hidden>
-              <button type="button" id="reset-btn" class="btn ghost">Reset</button>
-              <button type="button" id="resume-btn" class="btn lime">Resume</button>
             </div>
             <div id="done-row" class="primary-row stacked" hidden>
               <button type="button" id="save-btn" class="btn lime">Save today’s score</button>
