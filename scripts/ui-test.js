@@ -15,6 +15,18 @@ const puppeteer = require("puppeteer-core");
 
   const rxIcons = await page.$$(".movement .rx-icon");
   if (rxIcons.length !== 3) throw new Error(`expected 3 movement icons, got ${rxIcons.length}`);
+  const rowOrder = await page.$eval('.movement[data-i="0"]', (el) => {
+    const cls = (node) => (node.getAttribute("class") || "").split(" ")[0];
+    const kids = [...el.children].map(cls);
+    const end = [...el.querySelector(".rx-end").children].map(cls);
+    return { kids, end };
+  });
+  if (rowOrder.kids.join(" ") !== "reps name rx-end") {
+    throw new Error(`expected reps/name/rx-end, got ${rowOrder.kids.join(" ")}`);
+  }
+  if (rowOrder.end.join(" ") !== "rx-icon check") {
+    throw new Error(`expected icon then check, got ${rowOrder.end.join(" ")}`);
+  }
 
   const bit0 = await page.$eval("#bit-line", (el) => el.textContent.trim());
   if (!bit0) throw new Error("expected a quote under the timer");

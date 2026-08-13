@@ -37,6 +37,11 @@ for (const needle of [
   if (!html.includes(needle)) throw new Error(`index.html missing ${needle}`);
 }
 
+const pullups = html.slice(html.indexOf('data-i="0"'), html.indexOf('data-i="1"'));
+if (!/class="reps"[\s\S]*class="name"[\s\S]*class="rx-end"[\s\S]*class="rx-icon"[\s\S]*class="check"/.test(pullups)) {
+  throw new Error("movement row should be reps, name, icon, then check");
+}
+
 const js = fs.readFileSync(path.join(root, "app.js"), "utf8");
 if (!js.includes("serviceWorker")) throw new Error("service worker registration missing");
 if (!js.includes("20 * 60 * 1000")) throw new Error("20-minute cap missing");

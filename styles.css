@@ -316,7 +316,7 @@ input:focus-visible {
 .movement {
   width: 100%;
   display: grid;
-  grid-template-columns: 28px 36px 1fr 24px;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
   text-align: left;
@@ -326,10 +326,17 @@ input:focus-visible {
   padding: 8px 12px;
 }
 
+.movement .rx-end {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .movement .rx-icon {
   width: 28px;
   height: 28px;
   display: block;
+  flex: none;
   color: var(--accent);
   fill: none;
   stroke: currentColor;
@@ -347,6 +354,18 @@ input:focus-visible {
 
 .movement .name {
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.movement .name::after {
+  content: "";
+  flex: 1;
+  min-width: 10px;
+  border-bottom: 1.5px dotted color-mix(in srgb, var(--muted) 55%, transparent);
+  transform: translateY(-1px);
 }
 
 .check {
