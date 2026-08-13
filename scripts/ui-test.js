@@ -20,18 +20,23 @@ const puppeteer = require("puppeteer-core");
     throw new Error("Rick mark should show on the baseline skin");
   }
 
-  await page.evaluate(() => {
-    localStorage.setItem(
-      "amrap-tracker-v1",
-      JSON.stringify({
-        workouts: {},
-        settings: { sound: true, haptics: true, theme: "amrap" },
-      })
-    );
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 15000 }),
+    page.evaluate(() => {
+      localStorage.setItem(
+        "amrap-tracker-v1",
+        JSON.stringify({
+          workouts: {},
+          settings: { sound: true, haptics: true, theme: "amrap" },
+        })
+      );
+      location.reload();
+    }),
+  ]);
+  await page.waitForFunction(() => {
+    const stored = JSON.parse(localStorage.getItem("amrap-tracker-v1") || "{}");
+    return stored.settings && stored.settings.theme === "rick" && stored.settings.themeBaseline === 1;
   });
-  await page.reload({ waitUntil: "domcontentloaded", timeout: 15000 });
-  const migratedTheme = await page.evaluate(() => document.documentElement.dataset.theme);
-  if (migratedTheme !== "rick") throw new Error(`old AMRAP default should become rick, got ${migratedTheme}`);
   const migratedLabel = await page.$eval("#timer-label", (el) => el.textContent.trim());
   if (migratedLabel !== "Do it") throw new Error(`expected Do it after migrate, got ${migratedLabel}`);
 
@@ -118,6 +123,20 @@ const puppeteer = require("puppeteer-core");
 
   await page.click("#theme-handle");
   await page.waitForFunction(() => document.querySelector("#theme-tray").classList.contains("is-open"));
+  await page.waitForSelector('[data-theme-id="bofa"]');
+  await page.$eval('[data-theme-id="bofa"]', (el) => el.click());
+  const bofaTheme = await page.evaluate(() => document.documentElement.dataset.theme);
+  if (bofaTheme !== "bofa") throw new Error(`expected bofa theme, got ${bofaTheme}`);
+  await page.click('.tab[data-view="workout"]');
+  const bofaKicker = await page.$eval("#bit-card .bit-kicker", (el) => el.textContent.trim());
+  if (bofaKicker !== "Walken") throw new Error(`expected Walken kicker, got ${bofaKicker}`);
+  const bofaLine = await page.$eval("#bit-line", (el) => el.textContent.trim());
+  if (!/deez nuts/i.test(bofaLine)) throw new Error(`expected a Walken deez-nuts line, got ${bofaLine}`);
+  if (await page.$eval("#theme-mark", (el) => el.hidden)) throw new Error("Bofa mark should show");
+  await page.screenshot({ path: "/tmp/amrap-log.png" });
+
+  await page.click("#theme-handle");
+  await page.waitForFunction(() => document.querySelector("#theme-tray").classList.contains("is-open"));
   await page.waitForSelector('[data-theme-id="rick"]');
   await page.$eval('[data-theme-id="rick"]', (el) => el.click());
   const theme = await page.evaluate(() => document.documentElement.dataset.theme);
@@ -136,7 +155,6 @@ const puppeteer = require("puppeteer-core");
   const markHidden = await page.$eval("#theme-mark", (el) => el.hidden);
   if (markHidden) throw new Error("character mark should show for Rick");
 
-  await page.screenshot({ path: "/tmp/amrap-log.png" });
   console.log("ui tests ok");
   await browser.close();
 })().catch(async (error) => {

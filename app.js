@@ -10,14 +10,16 @@
   const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const THEMES = [
     {
-      id: "amrap",
-      name: "AMRAP",
-      bg: "#070708",
+      id: "bofa",
+      name: "Bofa",
+      bust: "themes/bofa/bust.jpg",
+      mark: "themes/bofa/mark.jpg",
+      bg: "#120e0a",
       labels: {
-        idle: "Tap to start",
-        running: "Tap to pause",
-        paused: "Tap to go",
-        finished: "Time",
+        idle: "Listen",
+        running: "Continue",
+        paused: "Wait",
+        finished: "That's it",
       },
     },
     {
@@ -241,6 +243,7 @@
       if (!prev.theme || prev.theme === "amrap") next.theme = DEFAULT_THEME;
       next.themeBaseline = THEME_BASELINE;
     }
+    if (next.theme === "amrap") next.theme = "bofa";
     if (!THEMES.some((theme) => theme.id === next.theme)) next.theme = DEFAULT_THEME;
     return next;
   }
@@ -573,7 +576,7 @@
   }
 
   function themeLines() {
-    return LINES[currentTheme().id] || LINES.amrap;
+    return LINES[currentTheme().id] || LINES.bofa;
   }
 
   function nextBit() {
@@ -584,7 +587,7 @@
   function renderBit() {
     const pool = themeLines();
     const text = pool[(dayLineIndex() + bitShift) % pool.length];
-    const kicker = LINE_KICKERS[currentTheme().id] || LINE_KICKERS.amrap;
+    const kicker = LINE_KICKERS[currentTheme().id] || LINE_KICKERS.bofa;
     els.bitLines.forEach((el) => {
       el.textContent = text;
     });
@@ -598,7 +601,7 @@
     els.themeRow.innerHTML = THEMES.map((theme) => {
       const portrait = theme.mark
         ? `<img src="${theme.mark}" alt="">`
-        : `<span class="theme-chip-fallback">20</span>`;
+        : `<span class="theme-chip-fallback">B</span>`;
       return `<button type="button" class="theme-chip${theme.id === active ? " is-active" : ""}" data-theme-id="${theme.id}" role="option" aria-selected="${theme.id === active}">
         ${portrait}
         <span>${theme.name}</span>
@@ -630,7 +633,13 @@
     save();
     if (announce) {
       setTrayOpen(false);
-      toast(theme.id === "scary-terry" ? "Scary Terry, bitch" : theme.name);
+      toast(
+        theme.id === "scary-terry"
+          ? "Scary Terry, bitch"
+          : theme.id === "bofa"
+            ? "Bofa deez nuts"
+            : theme.name
+      );
       buzz(16);
     }
   }
@@ -1017,7 +1026,7 @@
 
   if ("serviceWorker" in navigator) {
     let hadController = Boolean(navigator.serviceWorker.controller);
-    navigator.serviceWorker.register("./sw.js?v=21", { updateViaCache: "none" });
+    navigator.serviceWorker.register("./sw.js?v=22", { updateViaCache: "none" });
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (!hadController) {
         hadController = true;

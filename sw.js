@@ -1,4 +1,4 @@
-const CACHE = "amrap-v21";
+const CACHE = "amrap-v22";
 const ASSETS = [
   "./",
   "./index.html",
@@ -10,6 +10,8 @@ const ASSETS = [
   "./icons/icon-512.png",
   "./icons/apple-touch-icon.png",
   "./icons/favicon-32.png",
+  "./themes/bofa/bust.jpg",
+  "./themes/bofa/mark.jpg",
   "./themes/rick/bust.jpg",
   "./themes/rick/mark.jpg",
   "./themes/morty/bust.jpg",

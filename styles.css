@@ -891,6 +891,18 @@ body,
   box-shadow: 0 0 0 1px var(--accent);
 }
 
+[data-theme="bofa"] {
+  --bg: #120e0a;
+  --bg-elev: #1e1710;
+  --bg-elev-2: #2a2016;
+  --line: #4a3a22;
+  --accent: #e0b45a;
+  --accent-ink: #1a1200;
+  --text: #f6ead2;
+  --muted: #a89068;
+  --danger: #e85a3a;
+}
+
 [data-theme="rick"] {
   --bg: #0a1216;
   --bg-elev: #122026;

@@ -12,6 +12,8 @@ const required = [
   "icons/icon-192.png",
   "icons/icon-512.png",
   "icons/apple-touch-icon.png",
+  "themes/bofa/mark.jpg",
+  "themes/bofa/bust.jpg",
   "themes/rick/mark.jpg",
   "themes/rick/bust.jpg",
   "jokes.js",
@@ -48,12 +50,15 @@ if (!js.includes("serviceWorker")) throw new Error("service worker registration 
 if (!js.includes("20 * 60 * 1000")) throw new Error("20-minute cap missing");
 if (!js.includes("nextBit")) throw new Error("round-shift quote advance missing");
 if (!js.includes('const DEFAULT_THEME = "rick"')) throw new Error("Rick is not the baseline skin");
+if (!js.includes('if (next.theme === "amrap") next.theme = "bofa"')) {
+  throw new Error("old AMRAP skin should remap to Bofa");
+}
 
 const jokes = fs.readFileSync(path.join(root, "jokes.js"), "utf8");
 if (!jokes.includes("deez nuts")) throw new Error("Peele department missing");
 const jokeData = jokes.slice(jokes.indexOf("window.AMRAP_JOKES"));
 for (const key of [
-  "amrap",
+  "bofa",
   "rick",
   "morty",
   "beth",
@@ -64,6 +69,10 @@ for (const key of [
 ]) {
   if (!jokeData.includes(`"${key}"`)) throw new Error(`jokes missing ${key}`);
 }
+if (!jokes.includes('"bofa": "Walken"')) throw new Error("Bofa kicker should be Walken");
+const bofaBlock = jokeData.slice(jokeData.indexOf('"bofa": ['), jokeData.indexOf('"rick":'));
+const bofaNuts = bofaBlock.match(/deez nuts/g) || [];
+if (bofaNuts.length < 32) throw new Error(`Bofa pool needs 32 deez nuts, found ${bofaNuts.length}`);
 const counts = jokes.match(/deez nuts/gi) || [];
 if (counts.length < 8 * 30) throw new Error(`need 30+ jokes per character, found ${counts.length} deez nuts`);
 
