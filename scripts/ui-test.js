@@ -11,7 +11,29 @@ const puppeteer = require("puppeteer-core");
   await page.goto("http://127.0.0.1:8765/", { waitUntil: "domcontentloaded", timeout: 15000 });
 
   const startLabel = await page.$eval("#timer-label", (el) => el.textContent.trim());
-  if (startLabel !== "Tap to start") throw new Error(`expected Tap to start, got ${startLabel}`);
+  if (startLabel !== "Do it") throw new Error(`expected Do it, got ${startLabel}`);
+  const startTheme = await page.evaluate(() => document.documentElement.dataset.theme);
+  if (startTheme !== "rick") throw new Error(`expected rick baseline, got ${startTheme}`);
+  const startKicker = await page.$eval("#bit-card .bit-kicker", (el) => el.textContent.trim());
+  if (startKicker !== "Rick") throw new Error(`expected Rick kicker, got ${startKicker}`);
+  if (await page.$eval("#theme-mark", (el) => el.hidden)) {
+    throw new Error("Rick mark should show on the baseline skin");
+  }
+
+  await page.evaluate(() => {
+    localStorage.setItem(
+      "amrap-tracker-v1",
+      JSON.stringify({
+        workouts: {},
+        settings: { sound: true, haptics: true, theme: "amrap" },
+      })
+    );
+  });
+  await page.reload({ waitUntil: "domcontentloaded", timeout: 15000 });
+  const migratedTheme = await page.evaluate(() => document.documentElement.dataset.theme);
+  if (migratedTheme !== "rick") throw new Error(`old AMRAP default should become rick, got ${migratedTheme}`);
+  const migratedLabel = await page.$eval("#timer-label", (el) => el.textContent.trim());
+  if (migratedLabel !== "Do it") throw new Error(`expected Do it after migrate, got ${migratedLabel}`);
 
   const rxIcons = await page.$$(".movement .rx-icon");
   if (rxIcons.length !== 3) throw new Error(`expected 3 movement icons, got ${rxIcons.length}`);
@@ -33,7 +55,7 @@ const puppeteer = require("puppeteer-core");
   if (!/deez nuts/i.test(bit0)) throw new Error(`opening line missing deez nuts: ${bit0}`);
 
   await page.click("#timer-btn");
-  await page.waitForFunction(() => document.querySelector("#timer-label").textContent === "Tap to pause");
+  await page.waitForFunction(() => document.querySelector("#timer-label").textContent === "Keep going");
   await page.click("#round-btn");
   const bit1 = await page.$eval("#bit-line", (el) => el.textContent.trim());
   if (bit1 === bit0) throw new Error("adding a round should change the quote");
@@ -54,7 +76,7 @@ const puppeteer = require("puppeteer-core");
   if (bitAfterUndo === bit1) throw new Error("undoing a round should change the quote");
 
   await page.click("#timer-btn");
-  await page.waitForFunction(() => document.querySelector("#timer-label").textContent === "Tap to go");
+  await page.waitForFunction(() => document.querySelector("#timer-label").textContent === "Get up");
 
   await page.click("#quick-log-btn");
   await page.waitForSelector("#modal:not([hidden])");
@@ -68,6 +90,7 @@ const puppeteer = require("puppeteer-core");
   const stored = await page.evaluate(() => JSON.parse(localStorage.getItem("amrap-tracker-v1")));
   const today = Object.values(stored.workouts)[0];
   if (!today || today.rounds !== 14) throw new Error("workout was not saved");
+  if (stored.settings.theme !== "rick") throw new Error(`saved theme should stay rick, got ${stored.settings.theme}`);
 
   const line = await page.$eval("#bit-line", (el) => el.textContent.trim());
   if (!line) throw new Error("expected a rotating line under the timer");
@@ -83,6 +106,15 @@ const puppeteer = require("puppeteer-core");
   if (!history.includes("14")) throw new Error("history missing saved score");
   const logHasBit = await page.$("#view-log .bit-card");
   if (logHasBit) throw new Error("quote card should not be on the log");
+
+  await page.click("#theme-handle");
+  await page.waitForFunction(() => document.querySelector("#theme-tray").classList.contains("is-open"));
+  await page.waitForSelector('[data-theme-id="morty"]');
+  await page.$eval('[data-theme-id="morty"]', (el) => el.click());
+  const mortyTheme = await page.evaluate(() => document.documentElement.dataset.theme);
+  if (mortyTheme !== "morty") throw new Error(`expected morty theme, got ${mortyTheme}`);
+  const trayClosedAfterMorty = await page.$eval("#theme-tray", (el) => !el.classList.contains("is-open"));
+  if (!trayClosedAfterMorty) throw new Error("picking a skin should close the tray");
 
   await page.click("#theme-handle");
   await page.waitForFunction(() => document.querySelector("#theme-tray").classList.contains("is-open"));

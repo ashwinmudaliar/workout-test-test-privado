@@ -3,6 +3,8 @@
   const LEGACY_STORAGE_KEY = "cindy-tracker-v1";
   const INSTALL_KEY = "amrap-install-dismissed";
   const LEGACY_INSTALL_KEY = "cindy-install-dismissed";
+  const DEFAULT_THEME = "rick";
+  const THEME_BASELINE = 1;
   const WORKOUT_MS = 20 * 60 * 1000;
   const RING = 2 * Math.PI * 54;
   const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -228,11 +230,26 @@
     };
   }
 
+  function defaultSettings() {
+    return { sound: true, haptics: true, theme: DEFAULT_THEME, themeBaseline: THEME_BASELINE };
+  }
+
+  function normalizeSettings(settings) {
+    const prev = settings || {};
+    const next = { ...defaultSettings(), ...prev };
+    if ((prev.themeBaseline || 0) < THEME_BASELINE) {
+      if (!prev.theme || prev.theme === "amrap") next.theme = DEFAULT_THEME;
+      next.themeBaseline = THEME_BASELINE;
+    }
+    if (!THEMES.some((theme) => theme.id === next.theme)) next.theme = DEFAULT_THEME;
+    return next;
+  }
+
   function load() {
     const fallback = {
       workouts: {},
       live: defaultLive(),
-      settings: { sound: true, haptics: true, theme: "amrap" },
+      settings: defaultSettings(),
     };
     try {
       const raw = persist
@@ -243,7 +260,7 @@
       return {
         workouts: data.workouts || {},
         live: { ...defaultLive(), ...(data.live || {}) },
-        settings: { sound: true, haptics: true, theme: "amrap", ...(data.settings || {}) },
+        settings: normalizeSettings(data.settings),
       };
     } catch {
       return fallback;
@@ -537,8 +554,16 @@
     els.themeHandleLabel.textContent = trayOpen ? "Tap a face" : "Skins";
   }
 
+  function themeById(id) {
+    return (
+      THEMES.find((theme) => theme.id === id) ||
+      THEMES.find((theme) => theme.id === DEFAULT_THEME) ||
+      THEMES[0]
+    );
+  }
+
   function currentTheme() {
-    return THEMES.find((theme) => theme.id === state.settings.theme) || THEMES[0];
+    return themeById(state.settings.theme);
   }
 
   function dayLineIndex() {
@@ -582,7 +607,7 @@
   }
 
   function applyTheme(id, announce = false) {
-    const theme = THEMES.find((item) => item.id === id) || THEMES[0];
+    const theme = themeById(id);
     state.settings.theme = theme.id;
     document.documentElement.dataset.theme = theme.id;
     if (els.themeColorMeta) els.themeColorMeta.content = theme.bg;
@@ -992,7 +1017,7 @@
 
   if ("serviceWorker" in navigator) {
     let hadController = Boolean(navigator.serviceWorker.controller);
-    navigator.serviceWorker.register("./sw.js?v=20", { updateViaCache: "none" });
+    navigator.serviceWorker.register("./sw.js?v=21", { updateViaCache: "none" });
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (!hadController) {
         hadController = true;
@@ -1006,7 +1031,7 @@
 
   reconcileLive();
   if (state.live.status === "running") loop();
-  applyTheme(state.settings.theme || "amrap");
+  applyTheme(state.settings.theme || DEFAULT_THEME);
   render();
   showInstall();
 })();

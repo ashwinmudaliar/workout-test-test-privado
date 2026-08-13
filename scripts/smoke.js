@@ -33,6 +33,7 @@ for (const needle of [
   "bit-card",
   "BOFA Protocol",
   "rx-icon",
+  'data-theme="rick"',
 ]) {
   if (!html.includes(needle)) throw new Error(`index.html missing ${needle}`);
 }
@@ -46,6 +47,7 @@ const js = fs.readFileSync(path.join(root, "app.js"), "utf8");
 if (!js.includes("serviceWorker")) throw new Error("service worker registration missing");
 if (!js.includes("20 * 60 * 1000")) throw new Error("20-minute cap missing");
 if (!js.includes("nextBit")) throw new Error("round-shift quote advance missing");
+if (!js.includes('const DEFAULT_THEME = "rick"')) throw new Error("Rick is not the baseline skin");
 
 const jokes = fs.readFileSync(path.join(root, "jokes.js"), "utf8");
 if (!jokes.includes("deez nuts")) throw new Error("Peele department missing");

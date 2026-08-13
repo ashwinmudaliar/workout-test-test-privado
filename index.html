@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="rick">
   <head>
     <meta charset="utf-8" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1"
     />
-    <meta name="theme-color" content="#070708" />
+    <meta name="theme-color" content="#0a1216" />
     <meta name="color-scheme" content="dark" />
     <meta
       name="description"
@@ -21,7 +21,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <title>BOFA Protocol</title>
-    <link rel="stylesheet" href="./styles.css?v=20" />
+    <link rel="stylesheet" href="./styles.css?v=21" />
   </head>
   <body>
     <div id="app">
@@ -35,7 +35,7 @@
 
       <header class="top">
         <div class="brand">
-          <img id="theme-mark" class="theme-mark" alt="" hidden />
+          <img id="theme-mark" class="theme-mark" src="./themes/rick/mark.jpg" alt="" />
           <h1>BOFA Protocol</h1>
         </div>
         <button type="button" id="settings-btn" class="icon-btn" aria-label="Settings">
@@ -90,13 +90,13 @@
         <section id="view-workout" class="view is-active">
           <div class="hero">
             <button type="button" class="timer-wrap" id="timer-btn" aria-label="Start workout">
-              <img id="theme-bust" class="theme-bust" alt="" hidden />
+              <img id="theme-bust" class="theme-bust" src="./themes/rick/bust.jpg" alt="" />
               <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
                 <circle class="ring-track" cx="60" cy="60" r="54" />
                 <circle id="ring-value" class="ring-value" cx="60" cy="60" r="54" />
               </svg>
               <div class="timer-readout">
-                <p id="timer-label" class="timer-label">Tap to start</p>
+                <p id="timer-label" class="timer-label">Do it</p>
                 <p id="clock" class="clock" aria-live="polite">20:00</p>
                 <p id="timer-cap" class="cap">20:00 cap</p>
               </div>
@@ -106,7 +106,7 @@
               <p id="rounds" class="rounds">0</p>
             </div>
             <button type="button" id="bit-card" class="bit-card" aria-label="Next line">
-              <span class="bit-kicker">Peele dept.</span>
+              <span class="bit-kicker">Rick</span>
               <span id="bit-line" class="bit-line"></span>
               <span class="bit-hint">Tap for another</span>
             </button>
@@ -243,7 +243,7 @@
     </div>
 
     <div id="toast" class="toast" hidden></div>
-    <script src="./jokes.js?v=20" defer></script>
-    <script src="./app.js?v=20" defer></script>
+    <script src="./jokes.js?v=21" defer></script>
+    <script src="./app.js?v=21" defer></script>
   </body>
 </html>
