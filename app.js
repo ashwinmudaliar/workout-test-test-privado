@@ -112,28 +112,26 @@
   ];
 
   const LINES = [
+    "Chris, sit. The teacup is for your hands. Deez nuts are for the part where you try to leave.",
+    "The sunken place isn’t down. It’s the pause between “I’ll start tomorrow” and deez nuts.",
+    "They didn’t steal your body. They leased it. Clause nine is deez nuts.",
+    "There are two of you. One logged the rounds. One is still in the walls, whispering deez nuts.",
+    "Nope is about not looking. You looked. That’s on you. The feed is deez nuts.",
+    "The hypnosis isn’t the TV. It’s the voice that says you already did enough. Repeat after me: deez nuts.",
+    "A good neighbor waves. A great neighbor keeps a red light in the basement for deez nuts.",
+    "You walked in asking for rest. The family smiled. They heard deez nuts.",
+    "Your tethered already finished the 20. He’s under the bed. He brought deez nuts.",
+    "The deer on the hood was warning one. Warning two arrived in a cotton sack labeled deez nuts.",
+    "Motivation is the bait. The clock is the hook. The movie they actually shot is deez nuts.",
+    "Do not look at the sky. That’s how the spectacle eats. Look at deez nuts.",
+    "They clapped at the credits. They thought you got out. You made deez nuts.",
+    "If you’re reading this instead of moving, you’ve been chosen. The ceremony is deez nuts.",
+    "The Armitage dinner was never about the wine pairing. It was about deez nuts.",
+    "A quiet street. A perfect streak. A hole in the floor, breathing deez nuts.",
+    "You wanted a sign. The universe sent a teacup, a deer, an audience, and deez nuts.",
     "Twenty minutes. Everything after that is optional.",
     "The clock does not care how you feel. That’s the gift.",
-    "A streak is just yesterday agreeing with today.",
-    "You cannot think your way into the first pull-up.",
     "Nobody will clap. Do it anyway.",
-    "Start ugly. Finish on the clock.",
-    "You thought this was a workout app. That’s act one. The sunken place is deez nuts.",
-    "There is a you who skipped today. He lives downstairs. He is tending deez nuts.",
-    "The committee met in the dark. Unanimous. The motion carries: deez nuts.",
-    "Don’t look at the spectacle. The thing that looks back is deez nuts.",
-    "Get out of the story where you’re too tired. The exit is marked deez nuts.",
-    "They built a copy of you under the house. The original was always deez nuts.",
-    "Every system protects itself. This one protects deez nuts.",
-    "You came for discipline. Cute. The twist was deez nuts from page one.",
-    "The audience thinks they’re watching you suffer. They’re watching deez nuts.",
-    "I saved you a seat in the sunken place. Refreshments are deez nuts.",
-    "The tethered aren’t angry. They’re disappointed you forgot deez nuts.",
-    "Credits roll. The monster takes off the mask. It’s deez nuts. You clap anyway.",
-    "They hypnotized you with rest-day logic. Snap out. Also, deez nuts.",
-    "A quiet neighborhood. A perfect streak. A basement full of deez nuts.",
-    "You wanted a sign. The universe sent a teacup, a deer, and deez nuts.",
-    "The horror isn’t the twenty minutes. The horror is realizing it was deez nuts.",
   ];
 
   const els = {
@@ -191,8 +189,8 @@
     themeHandle: document.getElementById("theme-handle"),
     themeHandleLabel: document.getElementById("theme-handle-label"),
     themeRow: document.getElementById("theme-row"),
-    bitCard: document.getElementById("bit-card"),
-    bitLine: document.getElementById("bit-line"),
+    bitCards: document.querySelectorAll(".bit-card"),
+    bitLines: document.querySelectorAll(".bit-line"),
     brandSub: document.getElementById("brand-sub"),
     themeColorMeta: document.querySelector('meta[name="theme-color"]'),
   };
@@ -561,7 +559,10 @@
   }
 
   function renderBit() {
-    els.bitLine.textContent = LINES[(dayLineIndex() + bitShift) % LINES.length];
+    const text = LINES[(dayLineIndex() + bitShift) % LINES.length];
+    els.bitLines.forEach((el) => {
+      el.textContent = text;
+    });
   }
 
   function currentTheme() {
@@ -814,10 +815,12 @@
     setTrayOpen(!trayOpen);
   });
 
-  els.bitCard.addEventListener("click", () => {
-    bitShift += 1;
-    renderBit();
-    buzz(8);
+  els.bitCards.forEach((card) => {
+    card.addEventListener("click", () => {
+      bitShift += 1;
+      renderBit();
+      buzz(8);
+    });
   });
 
   let holdTimer = 0;
@@ -991,7 +994,7 @@
 
   if ("serviceWorker" in navigator) {
     let hadController = Boolean(navigator.serviceWorker.controller);
-    navigator.serviceWorker.register("./sw.js?v=6", { updateViaCache: "none" });
+    navigator.serviceWorker.register("./sw.js?v=7", { updateViaCache: "none" });
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (!hadController) {
         hadController = true;

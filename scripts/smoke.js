@@ -37,6 +37,7 @@ for (const needle of [
 const js = fs.readFileSync(path.join(root, "app.js"), "utf8");
 if (!js.includes("serviceWorker")) throw new Error("service worker registration missing");
 if (!js.includes("20 * 60 * 1000")) throw new Error("20-minute cap missing");
+if (!js.includes("deez nuts")) throw new Error("Peele department missing");
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, "manifest.json"), "utf8"));
 if (manifest.display !== "standalone") throw new Error("manifest must be standalone");
