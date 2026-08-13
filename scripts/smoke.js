@@ -93,11 +93,13 @@ const wickKeys = [
   "bowery-king",
   "caine",
   "adjudicator",
-  "sophia",
+  "marquis",
   "koji",
 ];
 if (kickers.bofa !== "Walken") throw new Error("Bofa kicker should be Walken");
 if (kickers.john !== "John") throw new Error("Wick kicker should be John");
+if (kickers.marquis !== "Marquis") throw new Error("Marquis kicker missing");
+if (pools.sophia || kickers.sophia) throw new Error("Sophia should be gone from the Wick pack");
 for (const key of [...rnmKeys, ...wickKeys]) {
   const pool = pools[key];
   if (!Array.isArray(pool)) throw new Error(`jokes missing ${key}`);

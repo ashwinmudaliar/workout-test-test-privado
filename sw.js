@@ -1,4 +1,4 @@
-const CACHE = "amrap-v26";
+const CACHE = "amrap-v27";
 const ASSETS = [
   "./",
   "./index.html",
@@ -39,8 +39,8 @@ const ASSETS = [
   "./themes/wick/caine/mark.jpg",
   "./themes/wick/adjudicator/bust.jpg",
   "./themes/wick/adjudicator/mark.jpg",
-  "./themes/wick/sophia/bust.jpg",
-  "./themes/wick/sophia/mark.jpg",
+  "./themes/wick/marquis/bust.jpg",
+  "./themes/wick/marquis/mark.jpg",
   "./themes/wick/koji/bust.jpg",
   "./themes/wick/koji/mark.jpg",
 ];

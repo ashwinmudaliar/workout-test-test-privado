@@ -181,13 +181,13 @@
       labels: { idle: "Comply", running: "Continue", paused: "Hold", finished: "Closed" },
     },
     {
-      id: "sophia",
-      name: "Sophia",
+      id: "marquis",
+      name: "Marquis",
       pack: "wick",
-      bust: "themes/wick/sophia/bust.jpg",
-      mark: "themes/wick/sophia/mark.jpg",
+      bust: "themes/wick/marquis/bust.jpg",
+      mark: "themes/wick/marquis/mark.jpg",
       bg: "#070707",
-      labels: { idle: "Move", running: "Hold it", paused: "Stay", finished: "Enough" },
+      labels: { idle: "Proceed", running: "Dance", paused: "Hold", finished: "Enough" },
     },
     {
       id: "koji",
@@ -345,11 +345,13 @@
       next.themeBaseline = THEME_BASELINE;
     }
     if (next.theme === "amrap") next.theme = "bofa";
+    if (next.theme === "sophia") next.theme = "marquis";
     const known = THEMES.find((theme) => theme.id === next.theme);
     if (!known) next.theme = DEFAULT_THEME;
     const theme = THEMES.find((item) => item.id === next.theme) || THEMES[0];
     next.pack = theme.pack || DEFAULT_PACK;
     next.packTheme = { rnm: "rick", wick: "john", ...(prev.packTheme || {}) };
+    if (next.packTheme.wick === "sophia") next.packTheme.wick = "marquis";
     PACKS.forEach((pack) => {
       if (!themeInPack(next.packTheme[pack.id], pack.id)) next.packTheme[pack.id] = pack.defaultId;
     });
@@ -1178,7 +1180,7 @@
 
   if ("serviceWorker" in navigator) {
     let hadController = Boolean(navigator.serviceWorker.controller);
-    navigator.serviceWorker.register("./sw.js?v=26", { updateViaCache: "none" });
+    navigator.serviceWorker.register("./sw.js?v=27", { updateViaCache: "none" });
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (!hadController) {
         hadController = true;
