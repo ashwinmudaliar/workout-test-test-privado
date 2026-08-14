@@ -1,4 +1,4 @@
-const CACHE = "amrap-v28";
+const CACHE = "amrap-v29";
 const ASSETS = [
   "./",
   "./index.html",
@@ -6,6 +6,7 @@ const ASSETS = [
   "./app.js",
   "./jokes.js",
   "./jokes-wick.js",
+  "./jokes-boys.js",
   "./manifest.json",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
@@ -43,6 +44,22 @@ const ASSETS = [
   "./themes/wick/marquis/mark.jpg",
   "./themes/wick/koji/bust.jpg",
   "./themes/wick/koji/mark.jpg",
+  "./themes/boys/homelander/bust.jpg",
+  "./themes/boys/homelander/mark.jpg",
+  "./themes/boys/butcher/bust.jpg",
+  "./themes/boys/butcher/mark.jpg",
+  "./themes/boys/hughie/bust.jpg",
+  "./themes/boys/hughie/mark.jpg",
+  "./themes/boys/mm/bust.jpg",
+  "./themes/boys/mm/mark.jpg",
+  "./themes/boys/frenchie/bust.jpg",
+  "./themes/boys/frenchie/mark.jpg",
+  "./themes/boys/soldier-boy/bust.jpg",
+  "./themes/boys/soldier-boy/mark.jpg",
+  "./themes/boys/deep/bust.jpg",
+  "./themes/boys/deep/mark.jpg",
+  "./themes/boys/stan-edgar/bust.jpg",
+  "./themes/boys/stan-edgar/mark.jpg",
 ];
 
 self.addEventListener("install", (event) => {

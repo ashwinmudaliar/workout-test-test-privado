@@ -1030,3 +1030,15 @@ body,
   --muted: #9a8a68;
   --danger: #c44a32;
 }
+
+[data-pack="boys"] {
+  --bg: #10080a;
+  --bg-elev: #1c1014;
+  --bg-elev-2: #261418;
+  --line: #4a2028;
+  --accent: #e23b2e;
+  --accent-ink: #1a0404;
+  --text: #f6ecec;
+  --muted: #b08888;
+  --danger: #ff5a4a;
+}

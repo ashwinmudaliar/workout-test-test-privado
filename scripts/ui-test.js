@@ -201,6 +201,25 @@ const puppeteer = require("puppeteer-core");
   }
   if (storedPacks.settings.theme !== "rick") throw new Error("active face after return should be rick");
 
+  await page.select("#pack-select", "boys");
+  await page.waitForFunction(() => document.documentElement.dataset.pack === "boys");
+  const boysTheme = await page.evaluate(() => document.documentElement.dataset.theme);
+  if (boysTheme !== "homelander") throw new Error(`first Boys visit should be Homelander, got ${boysTheme}`);
+  const trayOpenAfterBoys = await page.$eval("#theme-tray", (el) => el.classList.contains("is-open"));
+  if (!trayOpenAfterBoys) throw new Error("switching to The Boys should keep the tray open");
+  await page.click('.tab[data-view="workout"]');
+  const homeKicker = await page.$eval("#bit-card .bit-kicker", (el) => el.textContent.trim());
+  if (homeKicker !== "Homelander") throw new Error(`expected Homelander kicker, got ${homeKicker}`);
+  const homeLine = await page.$eval("#bit-line", (el) => el.textContent.trim());
+  if (!/deez nuts/i.test(homeLine)) throw new Error(`expected a Homelander deez-nuts line, got ${homeLine}`);
+  if (await page.$('[data-theme-id="winston"]')) throw new Error("Wick faces should hide in The Boys pack");
+  await page.waitForSelector('[data-theme-id="butcher"]');
+  await page.$eval('[data-theme-id="butcher"]', (el) => el.click());
+  const butcherTheme = await page.evaluate(() => document.documentElement.dataset.theme);
+  if (butcherTheme !== "butcher") throw new Error(`expected butcher, got ${butcherTheme}`);
+  const butcherKicker = await page.$eval("#bit-card .bit-kicker", (el) => el.textContent.trim());
+  if (butcherKicker !== "Butcher") throw new Error(`expected Butcher kicker, got ${butcherKicker}`);
+
   console.log("ui tests ok");
   await browser.close();
 })().catch(async (error) => {

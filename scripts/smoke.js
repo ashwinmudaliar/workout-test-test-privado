@@ -18,7 +18,10 @@ const required = [
   "themes/rick/bust.jpg",
   "jokes.js",
   "jokes-wick.js",
+  "jokes-boys.js",
   "themes/wick/john/bust.jpg",
+  "themes/boys/homelander/bust.jpg",
+  "themes/boys/butcher/bust.jpg",
   "themes/wick/john/mark.jpg",
   "themes/wick/winston/bust.jpg",
 ];
@@ -43,6 +46,7 @@ for (const needle of [
   'data-theme="rick"',
   'data-pack="rnm"',
   "jokes-wick.js",
+  "jokes-boys.js",
 ]) {
   if (!html.includes(needle)) throw new Error(`index.html missing ${needle}`);
 }
@@ -63,6 +67,9 @@ if (!js.includes('if (next.theme === "amrap") next.theme = "bofa"')) {
 if (!js.includes('id: "wick"') || !js.includes('defaultId: "john"')) {
   throw new Error("John Wick pack is missing");
 }
+if (!js.includes('id: "boys"') || !js.includes('defaultId: "homelander"')) {
+  throw new Error("The Boys pack is missing");
+}
 if (!js.includes("applyPack") || !js.includes("packTheme")) {
   throw new Error("pack switching / last-face memory missing");
 }
@@ -74,6 +81,8 @@ vm.createContext(context);
 vm.runInContext(jokes, context);
 const wickJokes = fs.readFileSync(path.join(root, "jokes-wick.js"), "utf8");
 vm.runInContext(wickJokes, context);
+const boysJokes = fs.readFileSync(path.join(root, "jokes-boys.js"), "utf8");
+vm.runInContext(boysJokes, context);
 const pools = context.window.AMRAP_JOKES;
 const kickers = context.window.AMRAP_JOKE_KICKERS;
 const rnmKeys = [
@@ -96,11 +105,24 @@ const wickKeys = [
   "marquis",
   "koji",
 ];
+const boysKeys = [
+  "homelander",
+  "butcher",
+  "hughie",
+  "mm",
+  "frenchie",
+  "soldier-boy",
+  "deep",
+  "stan-edgar",
+];
 if (kickers.bofa !== "Walken") throw new Error("Bofa kicker should be Walken");
 if (kickers.john !== "John") throw new Error("Wick kicker should be John");
 if (kickers.marquis !== "Marquis") throw new Error("Marquis kicker missing");
+if (kickers.homelander !== "Homelander") throw new Error("Homelander kicker missing");
+if (kickers.deep !== "The Deep") throw new Error("The Deep kicker missing");
 if (pools.sophia || kickers.sophia) throw new Error("Sophia should be gone from the Wick pack");
-for (const key of [...rnmKeys, ...wickKeys]) {
+if (pools.starlight || pools.kimiko) throw new Error("Starlight and Kimiko should not be in the Boys pack");
+for (const key of [...rnmKeys, ...wickKeys, ...boysKeys]) {
   const pool = pools[key];
   if (!Array.isArray(pool)) throw new Error(`jokes missing ${key}`);
   if (pool.length !== 32) throw new Error(`${key} pool should be 32, found ${pool.length}`);

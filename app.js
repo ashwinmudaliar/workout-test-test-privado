@@ -119,6 +119,7 @@
   const PACKS = [
     { id: "rnm", name: "Rick and Morty", defaultId: "rick" },
     { id: "wick", name: "John Wick", defaultId: "john" },
+    { id: "boys", name: "The Boys", defaultId: "homelander" },
   ];
 
   THEMES.forEach((theme) => {
@@ -197,6 +198,78 @@
       mark: "themes/wick/koji/mark.jpg",
       bg: "#070707",
       labels: { idle: "Begin", running: "Endure", paused: "Rest", finished: "Finished" },
+    },
+    {
+      id: "homelander",
+      name: "Homelander",
+      pack: "boys",
+      bust: "themes/boys/homelander/bust.jpg",
+      mark: "themes/boys/homelander/mark.jpg",
+      bg: "#12080a",
+      labels: { idle: "Smile", running: "Don't stop", paused: "Hold", finished: "Perfect" },
+    },
+    {
+      id: "butcher",
+      name: "Butcher",
+      pack: "boys",
+      bust: "themes/boys/butcher/bust.jpg",
+      mark: "themes/boys/butcher/mark.jpg",
+      bg: "#12080a",
+      labels: { idle: "Right", running: "Don't stop", paused: "Hold", finished: "Done" },
+    },
+    {
+      id: "hughie",
+      name: "Hughie",
+      pack: "boys",
+      bust: "themes/boys/hughie/bust.jpg",
+      mark: "themes/boys/hughie/mark.jpg",
+      bg: "#12080a",
+      labels: { idle: "Okay", running: "Keep going", paused: "Wait", finished: "Time" },
+    },
+    {
+      id: "mm",
+      name: "MM",
+      pack: "boys",
+      bust: "themes/boys/mm/bust.jpg",
+      mark: "themes/boys/mm/mark.jpg",
+      bg: "#12080a",
+      labels: { idle: "Focus", running: "Hold the line", paused: "Rest", finished: "Time" },
+    },
+    {
+      id: "frenchie",
+      name: "Frenchie",
+      pack: "boys",
+      bust: "themes/boys/frenchie/bust.jpg",
+      mark: "themes/boys/frenchie/mark.jpg",
+      bg: "#12080a",
+      labels: { idle: "Allez", running: "Continue", paused: "Attends", finished: "Voilà" },
+    },
+    {
+      id: "soldier-boy",
+      name: "Soldier Boy",
+      pack: "boys",
+      bust: "themes/boys/soldier-boy/bust.jpg",
+      mark: "themes/boys/soldier-boy/mark.jpg",
+      bg: "#12080a",
+      labels: { idle: "Move", running: "Don't quit", paused: "Hold", finished: "Dismissed" },
+    },
+    {
+      id: "deep",
+      name: "The Deep",
+      pack: "boys",
+      bust: "themes/boys/deep/bust.jpg",
+      mark: "themes/boys/deep/mark.jpg",
+      bg: "#12080a",
+      labels: { idle: "Breathe", running: "Keep going", paused: "Wait", finished: "Done" },
+    },
+    {
+      id: "stan-edgar",
+      name: "Stan Edgar",
+      pack: "boys",
+      bust: "themes/boys/stan-edgar/bust.jpg",
+      mark: "themes/boys/stan-edgar/mark.jpg",
+      bg: "#12080a",
+      labels: { idle: "Proceed", running: "Continue", paused: "Hold", finished: "Sufficient" },
     }
   );
 
@@ -325,7 +398,7 @@
       theme: DEFAULT_THEME,
       themeBaseline: THEME_BASELINE,
       pack: DEFAULT_PACK,
-      packTheme: { rnm: "rick", wick: "john" },
+      packTheme: { rnm: "rick", wick: "john", boys: "homelander" },
     };
   }
 
@@ -350,7 +423,7 @@
     if (!known) next.theme = DEFAULT_THEME;
     const theme = THEMES.find((item) => item.id === next.theme) || THEMES[0];
     next.pack = theme.pack || DEFAULT_PACK;
-    next.packTheme = { rnm: "rick", wick: "john", ...(prev.packTheme || {}) };
+    next.packTheme = { rnm: "rick", wick: "john", boys: "homelander", ...(prev.packTheme || {}) };
     if (next.packTheme.wick === "sophia") next.packTheme.wick = "marquis";
     PACKS.forEach((pack) => {
       if (!themeInPack(next.packTheme[pack.id], pack.id)) next.packTheme[pack.id] = pack.defaultId;
@@ -1180,7 +1253,7 @@
 
   if ("serviceWorker" in navigator) {
     let hadController = Boolean(navigator.serviceWorker.controller);
-    navigator.serviceWorker.register("./sw.js?v=28", { updateViaCache: "none" });
+    navigator.serviceWorker.register("./sw.js?v=29", { updateViaCache: "none" });
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (!hadController) {
         hadController = true;
